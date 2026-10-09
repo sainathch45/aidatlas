@@ -235,13 +235,19 @@ def allocate(req: AllocationRequest):
     top = sorted(districts, key=lambda d: d["quantity_allocated"], reverse=True)[: req.top_n_rationale]
     rationale_by_code = generate_rationale(get_gemini_client(), top, req.resource_type)
 
+    # Deterministic doc id per (resource_type, district) -- NOT including
+    # run_id -- so re-running an allocation for the same resource type
+    # overwrites the previous run's doc instead of accumulating stale
+    # duplicates. Hit this live: /ask was blending districts from
+    # multiple old runs together before this fix, visibly duplicating
+    # entries in its answers.
     run_id = str(uuid.uuid4())
     fs = get_firestore_client()
     batch = fs.batch()
     results = []
     for d in districts:
         doc = {
-            "allocation_id": f"{run_id}-{d['admin2_code']}",
+            "allocation_id": f"{req.resource_type}-{d['admin2_code']}",
             "run_id": run_id,
             "admin2_code": d["admin2_code"],
             "admin2_name": d["admin2_name"],
