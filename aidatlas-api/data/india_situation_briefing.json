@@ -1,0 +1,39 @@
+{
+  "_note": "Hand-compiled from public news reporting (not an official structured government dataset like HDX HAPI) -- compiled 2026-10-10. Every figure here traces to a named source. District HQ coordinates are standard public geography, not a crisis claim. No official funding-appeal figure exists for either state (unlike Syria/Myanmar's formal HRPs), so this briefing drives a priority-ranking draft, not a dollar allocation.",
+
+  "MHD": {
+    "name": "Maharashtra (2026 El Nino Drought)",
+    "crisis_summary": "Maharashtra declared drought in 265 of 358 talukas (74% of the state, 32 districts) after an 18-19% statewide monsoon rainfall deficit, with Marathwada region specifically ~40% below normal. ~7.29 million agricultural households potentially affected statewide. El Nino-driven; India cut its 2026-27 foodgrain production target as a result.",
+    "metric": "rainfall_deficit_pct",
+    "metric_label": "Monsoon rainfall deficit",
+    "sources": [
+      "https://www.businesstoday.in/india/story/el-nino-effect-maharashtra-declares-drought-across-265-talukas-as-rain-deficit-grips-74-of-state-558025-2026-09-26",
+      "https://www.freepressjournal.in/mumbai/maharashtra-ends-2026-monsoon-with-19-rainfall-deficit-marathwada-driest-at-40-below-normal",
+      "https://www.downtoearth.org.in/natural-disasters/maharashtra-declares-drought-in-265-talukas-as-crop-losses-mount-after-weak-monsoon"
+    ],
+    "districts": [
+      {"name": "Solapur", "value": 58, "note": "Worst-hit district by rainfall deficit", "lat": 17.6599, "lon": 75.9064},
+      {"name": "Beed", "value": 51, "lat": 18.9894, "lon": 75.7601},
+      {"name": "Hingoli", "value": 49, "lat": 19.7172, "lon": 77.1492},
+      {"name": "Jalna", "value": 46, "lat": 19.8347, "lon": 75.8816},
+      {"name": "Dharashiv", "value": 45, "lat": 18.1860, "lon": 76.0419},
+      {"name": "Latur", "value": 39, "note": "Figure is % of annual average rainfall received, i.e. ~61% deficit -- kept as the lower-confidence raw figure actually reported rather than converted, since the source gave it this way", "lat": 18.4088, "lon": 76.5604}
+    ]
+  },
+
+  "ASF": {
+    "name": "Assam (2026 Floods)",
+    "crisis_summary": "Two separate 2026 flood events: a July 19 cloudburst-triggered flood in Upper Assam (Sivasagar, Charaideo, Jorhat, Golaghat), and widespread late-June monsoon flooding (Dhemaji, Dibrugarh, Lakhimpur, Chirang, Nalbari). Over 700,000 people displaced statewide, 100+ deaths, ~119,000 hectares of cropland submerged. Charaideo and Jorhat are also real, named affected districts from the same event, but no source found gave them a separately quantified figure (only that Sivasagar alone exceeded both combined) -- left out of the ranked list below rather than estimated, per this project's no-fabrication rule.",
+    "metric": "villages_affected",
+    "metric_label": "Villages affected",
+    "sources": [
+      "https://www.smilefoundationindia.org/blog/assam-floods-2026-numbers-causes/",
+      "https://www.mapsofindia.com/my-india/news/assam-floods-2026-death-toll-affected-districts-and-relief-efforts",
+      "https://en.wikipedia.org/wiki/2026_Assam_floods"
+    ],
+    "districts": [
+      {"name": "Golaghat", "value": 145, "note": "Most affected villages of any district", "lat": 26.5106, "lon": 93.9647},
+      {"name": "Sivasagar", "value": 110, "note": "Also hardest hit by population affected (348,000 at peak), the single largest population figure found for any district in this event", "lat": 26.9850, "lon": 94.6378}
+    ]
+  }
+}

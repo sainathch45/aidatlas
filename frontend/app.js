@@ -131,13 +131,18 @@ async function switchCrisis(code) {
   document.getElementById("ask-log").innerHTML = "";
 
   if (meta) {
+    const isDrafted = meta.mode === "ai_drafted";
     map.setCenter(meta.map_center);
     map.setZoom(meta.map_zoom);
-    document.getElementById("stat-appeal").textContent = `${meta.appeal_code} (${meta.name})`;
+    document.getElementById("stat-appeal").textContent = isDrafted
+      ? `${meta.name} (no official plan)`
+      : `${meta.appeal_code} (${meta.name})`;
     document.getElementById("stat-status").textContent = "LIVE DATA — UNALLOCATED";
-    document.getElementById("stat-status").classList.remove("allocated");
-    document.getElementById("stat-pool").textContent = "—";
-    document.getElementById("stat-funded").textContent = `${meta.funding_pct}% funded`;
+    document.getElementById("stat-status").classList.remove("allocated", "drafted");
+    document.getElementById("stat-pool").textContent = isDrafted ? "N/A" : "—";
+    document.getElementById("stat-funded").textContent = isDrafted ? "No formal appeal" : `${meta.funding_pct}% funded`;
+    document.getElementById("run-btn").textContent = isDrafted ? "DRAFT PRIORITY PLAN" : "RUN ALLOCATION";
+    document.getElementById("detail-sources").hidden = true;
   }
   await loadDistricts();
 }
@@ -175,34 +180,60 @@ function showDistrict(code) {
   document.getElementById("detail-name").textContent = `${d.admin_name} — ${d.admin_parent_name}`;
 
   // Context shape varies by crisis: Syria gives IDP population + org
-  // count regardless of resource type; Myanmar gives a sector-specific
-  // "people in need" figure instead. Both real, just different real
-  // signals -- render whichever this crisis actually has.
+  // count; Myanmar gives a sector-specific "people in need" figure;
+  // the AI-drafted India crises give a cited real-world metric (rainfall
+  // deficit %, villages affected) with no official funding/sector data.
+  // Render whichever this crisis actually has, don't force one shape.
   const ctx = d.context || {};
+  const sourcesEl = document.getElementById("detail-sources");
   if ("idp_population" in ctx) {
     document.getElementById("detail-pop-label").textContent = "IDP population";
     document.getElementById("detail-pop").textContent = (ctx.idp_population ?? 0).toLocaleString();
     document.getElementById("detail-orgs-label").textContent = "Orgs active";
     document.getElementById("detail-orgs").textContent = ctx.active_org_count ?? "—";
-  } else {
+    sourcesEl.hidden = true;
+  } else if ("people_in_need" in ctx) {
     document.getElementById("detail-pop-label").textContent = "People in need";
     document.getElementById("detail-pop").textContent = (ctx.people_in_need ?? d.need_score ?? 0).toLocaleString();
     document.getElementById("detail-orgs-label").textContent = "Sector";
     document.getElementById("detail-orgs").textContent = ctx.sector ?? "—";
+    sourcesEl.hidden = true;
+  } else {
+    document.getElementById("detail-pop-label").textContent = ctx.metric_label || "Metric";
+    document.getElementById("detail-pop").textContent = (ctx.metric_value ?? d.need_score ?? 0).toLocaleString();
+    document.getElementById("detail-orgs-label").textContent = "Status";
+    document.getElementById("detail-orgs").textContent = "Draft, not official";
+    if (ctx.sources?.length) {
+      sourcesEl.innerHTML = "Sources: " + ctx.sources.map((u, i) => `<a href="${u}" target="_blank" rel="noopener">[${i + 1}]</a>`).join(" ");
+      sourcesEl.hidden = false;
+    } else {
+      sourcesEl.hidden = true;
+    }
   }
   document.getElementById("detail-need").textContent = d.need_score ? d.need_score.toFixed(1) : "—";
-  document.getElementById("detail-amount").textContent =
-    d.quantity_allocated != null ? "$" + d.quantity_allocated.toLocaleString() : "not yet allocated";
 
+  if (d.priority_rank != null) {
+    document.getElementById("detail-amount-label").textContent = "Priority";
+    document.getElementById("detail-amount").textContent = `#${d.priority_rank}`;
+  } else {
+    document.getElementById("detail-amount-label").textContent = "Allocated";
+    document.getElementById("detail-amount").textContent =
+      d.quantity_allocated != null ? "$" + d.quantity_allocated.toLocaleString() : "not yet allocated";
+  }
+
+  const figureNoun = d.priority_rank != null ? "ranking" : "allocation amount";
+  const figureSource = d.priority_rank != null ? "the real cited figures above" : "BigQuery";
   let rationaleMessage;
   if (d.rationale_text) {
     rationaleMessage = d.rationale_text;
   } else if (!allocationRun) {
-    rationaleMessage = "Run an allocation to generate Gemini's rationale for this location.";
+    rationaleMessage = d.priority_rank != null
+      ? "Run the draft to generate Gemini's rationale for this location."
+      : "Run an allocation to generate Gemini's rationale for this location.";
   } else if (d.rationale_generated === false) {
-    rationaleMessage = "Gemini was unavailable for this entire run (free-tier daily quota reached, or a temporary outage) — no location got AI commentary this run, not just this one. The allocation amount above is still real, computed from BigQuery.";
+    rationaleMessage = `Gemini was unavailable for this entire run (free-tier daily quota reached, or a temporary outage) — no location got AI commentary this run, not just this one. The ${figureNoun} above is still real, computed from ${figureSource}.`;
   } else {
-    rationaleMessage = "This location wasn't in the top-N narrated this run (Gemini only writes rationale for the largest allocations, to stay within rate limits) — its allocation amount above is still real.";
+    rationaleMessage = `This location wasn't in the top-N narrated this run (Gemini only writes rationale for the largest allocations, to stay within rate limits) — its ${figureNoun} above is still real.`;
   }
   document.getElementById("detail-rationale").textContent = rationaleMessage;
 
@@ -293,19 +324,32 @@ async function runAllocation() {
     data.allocations.forEach((d) => {
       districtData[d.admin_code] = { ...districtData[d.admin_code], ...d };
     });
-    const maxAmount = Math.max(...data.allocations.map((d) => d.quantity_allocated));
-    repaintMarkers(maxAmount);
 
-    document.getElementById("stat-pool").textContent = "$" + data.supply_pool_usd.toLocaleString();
+    const isDrafted = data.mode === "ai_drafted";
+    const maxValue = isDrafted
+      ? Math.max(...data.allocations.map((d) => d.need_score))
+      : Math.max(...data.allocations.map((d) => d.quantity_allocated));
+    repaintMarkers(maxValue);
+
+    document.getElementById("stat-pool").textContent = isDrafted
+      ? "N/A — no official appeal"
+      : "$" + data.supply_pool_usd.toLocaleString();
+
     const statusEl = document.getElementById("stat-status");
-    statusEl.textContent = `ALLOCATED — ${currentResourceType.toUpperCase()}`;
-    statusEl.classList.add("allocated");
+    statusEl.textContent = isDrafted
+      ? `AI-DRAFTED (NOT OFFICIAL) — ${currentResourceType.toUpperCase()}`
+      : `ALLOCATED — ${currentResourceType.toUpperCase()}`;
+    statusEl.classList.toggle("allocated", !isDrafted);
+    statusEl.classList.toggle("drafted", isDrafted);
     allocationRun = true;
 
-    const top = [...data.allocations].sort((a, b) => b.quantity_allocated - a.quantity_allocated)[0];
+    const top = isDrafted
+      ? [...data.allocations].sort((a, b) => a.priority_rank - b.priority_rank)[0]
+      : [...data.allocations].sort((a, b) => b.quantity_allocated - a.quantity_allocated)[0];
     showDistrict(top.admin_code);
 
-    setRunStatus(`Done — ${data.district_count} locations allocated, top 10 narrated by Gemini.`);
+    const verb = isDrafted ? "ranked (draft, not official)" : "allocated";
+    setRunStatus(`Done — ${data.district_count} locations ${verb}, top ${Math.min(10, data.district_count)} narrated by Gemini.`);
   } catch (err) {
     setRunStatus("Allocation failed: " + err.message, true);
     document.getElementById("stat-status").textContent = "ERROR";

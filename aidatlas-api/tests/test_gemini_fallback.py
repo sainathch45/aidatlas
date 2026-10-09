@@ -78,7 +78,7 @@ def test_generate_rationale_reports_unavailable_vs_empty_dict():
         "context": {"idp_population": 1, "active_org_count": 1},
         "quantity_allocated": 1.0,
     }
-    result = main.generate_rationale(client, [district], "food", "Syria")
+    result = main.generate_rationale(client, [district], "food", "Syria", "hrp_grounded")
     assert result == {}  # bool({}) is False -> caller can tell this apart from a real empty top-N list
     main.QUOTA_EXHAUSTED = False
 
@@ -108,8 +108,10 @@ def test_ask_falls_back_gracefully_when_gemini_unavailable():
         )
     ]
     fake_fs = MagicMock()
-    # Two chained .where() calls now: crisis_region then resource_type.
-    fake_fs.collection.return_value.where.return_value.where.return_value.order_by.return_value.limit.return_value.stream.return_value = fake_docs
+    # Two chained .where() calls (crisis_region then resource_type), no
+    # order_by/limit -- sorting moved to Python so small result sets
+    # don't need a composite index per crisis mode.
+    fake_fs.collection.return_value.where.return_value.where.return_value.stream.return_value = fake_docs
 
     with patch.object(main, "get_firestore_client", return_value=fake_fs), patch.object(
         main, "get_gemini_client", return_value=MagicMock()

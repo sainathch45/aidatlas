@@ -74,6 +74,7 @@ BQ_DATASET = os.environ.get("BIGQUERY_DATASET", "crisis_allocator")
 CRISIS_REGISTRY = {
     "SYR": {
         "name": "Syria",
+        "mode": "hrp_grounded",
         "appeal_code": "HSYR26",
         "appeal_label": "the 2026 HSYR26 Humanitarian Needs and Response Plan",
         "funding_table": "raw_funding",
@@ -84,6 +85,7 @@ CRISIS_REGISTRY = {
     },
     "MMR": {
         "name": "Myanmar",
+        "mode": "hrp_grounded",
         "appeal_code": "HMMR26",
         "appeal_label": "the 2026 HMMR26 Humanitarian Needs and Response Plan",
         "funding_table": "raw_funding_mmr",
@@ -92,7 +94,30 @@ CRISIS_REGISTRY = {
         "map_center": {"lat": 21.9, "lng": 96.0},
         "map_zoom": 6,
     },
+    # "ai_drafted" mode: no formal UN Humanitarian Response Plan exists for
+    # these (India self-manages disaster response, so it isn't in HDX
+    # HAPI's 20-country HRP list), so there's no real appeal/funding
+    # figure to split. Instead of a dollar allocation, this mode produces
+    # a Gemini-drafted PRIORITY RANKING from real but non-standardized
+    # public reporting (compiled in data/india_situation_briefing.json,
+    # every figure cited), explicitly labeled as drafted, not official.
+    "MHD": {
+        "name": "Maharashtra (2026 El Nino Drought)",
+        "mode": "ai_drafted",
+        "map_center": {"lat": 18.9, "lng": 76.3},
+        "map_zoom": 7,
+    },
+    "ASF": {
+        "name": "Assam (2026 Floods)",
+        "mode": "ai_drafted",
+        "map_center": {"lat": 26.7, "lng": 94.3},
+        "map_zoom": 8,
+    },
 }
+
+_BRIEFING_PATH = os.path.join(os.path.dirname(__file__), "data", "india_situation_briefing.json")
+with open(_BRIEFING_PATH, encoding="utf-8") as f:
+    INDIA_BRIEFING = json.load(f)
 
 # Myanmar's humanitarian_needs data is genuinely broken down by sector
 # (confirmed SHL/FSC/HEA all present at the same latest period before
@@ -228,6 +253,32 @@ def fetch_district_need_scores(bq: bigquery.Client, crisis_region: str, resource
             for r in rows
         ]
 
+    if crisis_region in ("MHD", "ASF"):
+        # No BigQuery involved -- this data isn't a clean HDX export, it's
+        # the hand-compiled, cited briefing in india_situation_briefing.json
+        # (real figures, non-standardized format, no official funding
+        # total to split). resource_type is accepted for API consistency
+        # but doesn't change the result -- the underlying reporting isn't
+        # broken down by sector the way Myanmar's is.
+        briefing = INDIA_BRIEFING[crisis_region]
+        return [
+            {
+                "admin_name": d["name"],
+                "admin_parent_name": briefing["name"],
+                "admin_code": f"{crisis_region}-{d['name'].upper().replace(' ', '_')}",
+                "need_score": d["value"],
+                "lat": d.get("lat"),
+                "lon": d.get("lon"),
+                "context": {
+                    "metric_label": briefing["metric_label"],
+                    "metric_value": d["value"],
+                    "note": d.get("note", ""),
+                    "sources": briefing["sources"],
+                },
+            }
+            for d in briefing["districts"]
+        ]
+
     raise HTTPException(
         status_code=400,
         detail=f"Unsupported crisis_region {crisis_region!r}. Supported: {list(CRISIS_REGISTRY)}",
@@ -293,23 +344,52 @@ def format_district_line(d: dict) -> str:
     base = f"- admin_code={d['admin_code']}, name={d['admin_name']} ({d['admin_parent_name']})"
     if "idp_population" in ctx:
         detail = f"idp_population={ctx['idp_population']}, active_org_count={ctx['active_org_count']}"
-    else:
+    elif "people_in_need" in ctx:
         detail = f"people_in_need={ctx['people_in_need']:,.0f} ({ctx['sector']} sector)"
-    return f"{base}, {detail}, allocated_usd={d['quantity_allocated']:,.0f}"
+    else:
+        # ai_drafted mode: no dollar figure exists, so no allocated_usd --
+        # cite the real metric this ranking is actually based on instead.
+        detail = f"{ctx['metric_label']}={ctx['metric_value']}"
+        if ctx.get("note"):
+            detail += f" ({ctx['note']})"
+    if d.get("quantity_allocated") is not None:
+        return f"{base}, {detail}, allocated_usd={d['quantity_allocated']:,.0f}"
+    return f"{base}, {detail}, priority_rank={d.get('priority_rank', '?')}"
 
 
-def generate_rationale(client: genai.Client, top_districts: list[dict], resource_type: str, crisis_name: str) -> dict[str, str]:
+def generate_rationale(
+    client: genai.Client, top_districts: list[dict], resource_type: str, crisis_name: str, mode: str
+) -> dict[str, str]:
     """One batched Gemini call for the top allocations, not one call per
     district -- Vertex AI latency (3-30s observed live) makes
     per-district calls impractical, and a coordinator doesn't need prose
     for all districts anyway, just the ones receiving significant aid.
     """
+    if mode == "hrp_grounded":
+        task = (
+            f"You are assisting a humanitarian coordinator allocating {resource_type} aid "
+            f"across {crisis_name}, drawn from a real, currently active humanitarian response "
+            "plan. For each location below, write one plain-language sentence (max 30 words) "
+            "explaining WHY it received this allocation, citing the real figures given."
+        )
+    else:
+        # ai_drafted mode: no official plan or funding total exists for
+        # this crisis (confirmed -- not in HDX HAPI's 20-country formal
+        # HRP list). Gemini is drafting a PROPOSED priority order from
+        # real but non-standardized public reporting, not citing an
+        # official allocation -- the prompt has to make that distinction
+        # explicit, or the output could misleadingly read as official.
+        task = (
+            f"You are drafting a PROPOSED, NON-OFFICIAL {resource_type} relief priority ranking "
+            f"for {crisis_name}, based on real public reporting (cited figures below) since no "
+            "formal government-coordinated response plan exists for this crisis yet. For each "
+            "location below, write one plain-language sentence (max 30 words) explaining why it "
+            "ranks where it does, citing the real figure given. Do not imply this is an official "
+            "or funded allocation -- frame it as a draft recommendation only."
+        )
     prompt = (
-        f"You are assisting a humanitarian coordinator allocating {resource_type} aid "
-        f"across {crisis_name}, drawn from a real, currently active humanitarian response "
-        "plan. For each location below, write one plain-language sentence (max 30 words) "
-        "explaining WHY it received this allocation, citing the real figures given. "
-        "Be specific to the numbers given, not generic. Plain prose only -- no markdown "
+        task
+        + " Be specific to the numbers given, not generic. Plain prose only -- no markdown "
         "formatting (no asterisks, no bullet points, no headers), since this renders as "
         "plain text in the UI.\n\n"
         "Locations:\n"
@@ -326,6 +406,19 @@ def generate_rationale(client: genai.Client, top_districts: list[dict], resource
         # Gemini occasionally wraps JSON in prose despite the mime type
         # hint -- fail soft, the allocation numbers aren't affected.
         return {}
+
+
+def rank_by_need(districts: list[dict]) -> list[dict]:
+    """ai_drafted mode: no real funding total to split, so no dollar
+    allocation math -- just rank by the real metric and assign a
+    priority_rank. quantity_allocated stays None throughout, which the
+    frontend uses to tell this mode apart from the HRP-grounded one.
+    """
+    ordered = sorted(districts, key=lambda d: d["need_score"], reverse=True)
+    for i, d in enumerate(ordered, start=1):
+        d["priority_rank"] = i
+        d["quantity_allocated"] = None
+    return ordered
 
 
 class AllocationRequest(BaseModel):
@@ -345,15 +438,20 @@ def allocate(req: AllocationRequest):
     if not districts:
         raise HTTPException(
             status_code=404,
-            detail=f"No need-score data in BigQuery for {req.crisis_region} yet — run the matching "
+            detail=f"No need-score data for {req.crisis_region} yet — run the matching "
             "bigquery/load_*.sh and schema*.sql first",
         )
 
-    supply_pool = fetch_supply_pool(bq, crisis["funding_table"], crisis["appeal_code"])
-    districts = compute_proportional_allocation(districts, supply_pool)
+    if crisis["mode"] == "hrp_grounded":
+        supply_pool = fetch_supply_pool(bq, crisis["funding_table"], crisis["appeal_code"])
+        districts = compute_proportional_allocation(districts, supply_pool)
+        top = sorted(districts, key=lambda d: d["quantity_allocated"], reverse=True)[: req.top_n_rationale]
+    else:
+        supply_pool = None
+        districts = rank_by_need(districts)
+        top = districts[: req.top_n_rationale]
 
-    top = sorted(districts, key=lambda d: d["quantity_allocated"], reverse=True)[: req.top_n_rationale]
-    rationale_by_code = generate_rationale(get_gemini_client(), top, req.resource_type, crisis["name"])
+    rationale_by_code = generate_rationale(get_gemini_client(), top, req.resource_type, crisis["name"], crisis["mode"])
     # Distinguishes "Gemini was unavailable for this whole run" from "this
     # district just wasn't in the top N narrated" -- without this, every
     # district showed the same "outside top-N" message even when quota
@@ -382,11 +480,13 @@ def allocate(req: AllocationRequest):
             "resource_type": req.resource_type,
             "need_score": d["need_score"],
             "quantity_allocated": d["quantity_allocated"],
+            "priority_rank": d.get("priority_rank"),
             "lat": d["lat"],
             "lon": d["lon"],
             "context": d["context"],
             "rationale_text": rationale_by_code.get(d["admin_code"], ""),
             "rationale_generated": rationale_generated,
+            "mode": crisis["mode"],
         }
         batch.set(fs.collection("allocations").document(doc["allocation_id"]), doc)
         results.append(doc)
@@ -396,6 +496,7 @@ def allocate(req: AllocationRequest):
         "run_id": run_id,
         "crisis_region": req.crisis_region,
         "crisis_name": crisis["name"],
+        "mode": crisis["mode"],
         "resource_type": req.resource_type,
         "supply_pool_usd": supply_pool,
         "district_count": len(results),
@@ -436,36 +537,56 @@ def ask(req: AskRequest):
         raise HTTPException(status_code=400, detail=f"Unsupported crisis_region {req.crisis_region!r}")
     crisis = CRISIS_REGISTRY[req.crisis_region]
 
+    # Plain equality filters only (no order_by) -- avoids needing yet
+    # another Firestore composite index per mode. Dataset sizes here are
+    # small (at most 61 docs for Syria) so sorting the fetched set in
+    # Python instead of in Firestore is trivial, not a real cost.
     fs = get_firestore_client()
     docs = (
         fs.collection("allocations")
         .where("crisis_region", "==", req.crisis_region)
         .where("resource_type", "==", req.resource_type)
-        .order_by("quantity_allocated", direction=firestore.Query.DESCENDING)
-        .limit(20)
         .stream()
     )
-    context_rows = [doc.to_dict() for doc in docs]
-    if not context_rows:
+    all_rows = [doc.to_dict() for doc in docs]
+    if not all_rows:
         raise HTTPException(
             status_code=404,
             detail=f"No allocation run yet for {req.crisis_region}/{req.resource_type} — call /allocate first",
         )
 
-    context_text = "\n".join(
-        f"- {d['admin_name']} ({d['admin_parent_name']}, code {d['admin_code']}): "
-        f"allocated ${d['quantity_allocated']:,.0f}, need_score {d['need_score']:.1f}"
-        for d in context_rows
-    )
-    total_allocated = sum(d["quantity_allocated"] for d in context_rows)
+    if crisis["mode"] == "hrp_grounded":
+        context_rows = sorted(all_rows, key=lambda d: d["quantity_allocated"], reverse=True)[:20]
+        context_text = "\n".join(
+            f"- {d['admin_name']} ({d['admin_parent_name']}, code {d['admin_code']}): "
+            f"allocated ${d['quantity_allocated']:,.0f}, need_score {d['need_score']:.1f}"
+            for d in context_rows
+        )
+        total_allocated = sum(d["quantity_allocated"] for d in context_rows)
+        basis = (
+            f"a real {req.resource_type} aid allocation for {crisis['name']}, drawn from "
+            f"{crisis['appeal_label']}. Below are the top {len(context_rows)} locations by "
+            f"allocation in the current run (combined ${total_allocated:,.0f} of the total pool)"
+        )
+    else:
+        context_rows = sorted(all_rows, key=lambda d: d["priority_rank"])[:20]
+        context_text = "\n".join(
+            f"- {d['admin_name']} ({d['admin_parent_name']}, code {d['admin_code']}): "
+            f"priority rank #{d['priority_rank']}, {d['context'].get('metric_label', 'metric')} "
+            f"{d['context'].get('metric_value', d['need_score'])}"
+            for d in context_rows
+        )
+        basis = (
+            f"a DRAFT, NON-OFFICIAL {req.resource_type} relief priority ranking for {crisis['name']} "
+            f"(no formal government-coordinated plan exists for this crisis). Below are the "
+            f"{len(context_rows)} ranked locations, based on real but non-standardized public reporting"
+        )
+
     prompt = (
-        f"You are AidAtlas, assisting a humanitarian coordinator reviewing a real "
-        f"{req.resource_type} aid allocation for {crisis['name']}, drawn from {crisis['appeal_label']}. "
-        f"Below are the top {len(context_rows)} locations by allocation in the current run "
-        f"(combined ${total_allocated:,.0f} of the total pool):\n\n{context_text}\n\n"
+        f"You are AidAtlas, assisting a humanitarian coordinator reviewing {basis}:\n\n{context_text}\n\n"
         f'Coordinator question: "{req.question}"\n\n'
         "Answer using ONLY the numbers above. If the question references a location not "
-        "listed here, say plainly that it's outside the top locations shown rather than "
+        "listed here, say plainly that it's outside the locations shown rather than "
         "guessing at its figures. Be concise (under 90 words), specific, and cite real "
         "numbers from the list. Plain prose only -- no markdown formatting (no asterisks, "
         "no bullet points, no headers), since this renders as plain text in the UI."
@@ -476,11 +597,13 @@ def ask(req: AskRequest):
         # same context Gemini would have reasoned over, rather than a
         # bare error, since the free tier's daily quota can genuinely
         # run out mid-demo (confirmed live, not hypothetical).
+        if crisis["mode"] == "hrp_grounded":
+            summary = "; ".join(f"{d['admin_name']} ${d['quantity_allocated']:,.0f}" for d in context_rows[:5])
+        else:
+            summary = "; ".join(f"#{d['priority_rank']} {d['admin_name']}" for d in context_rows[:5])
         answer = (
             "AI commentary is temporarily unavailable (Gemini's free-tier daily quota, or a transient "
-            f"outage). Here are the real top {len(context_rows)} locations by allocation this run: "
-            + "; ".join(f"{d['admin_name']} ${d['quantity_allocated']:,.0f}" for d in context_rows[:5])
-            + "."
+            f"outage). Here are the real top locations this run: {summary}."
         )
 
     return {
