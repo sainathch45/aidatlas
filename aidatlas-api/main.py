@@ -12,11 +12,16 @@ Local run:
 
 import os
 
+from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from google import genai
 from pydantic import BaseModel
 
-app = FastAPI(title="Crisis Resource Allocator")
+# No-op in Cloud Run (env vars are injected directly there); picks up
+# aidatlas-api/.env for local runs.
+load_dotenv()
+
+app = FastAPI(title="AidAtlas")
 
 # Confirmed available on the Gemini free tier as of Oct 2026 research; if
 # AI Studio's model picker shows a newer default (e.g. a Gemini 3 Flash

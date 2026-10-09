@@ -8,19 +8,9 @@
 
 CREATE SCHEMA IF NOT EXISTS crisis_allocator;
 
--- Load the raw CSVs with schema autodetect (their headers are clean and
--- consistently typed across every HAPI country export, so there's no
--- value in hand-writing column defs that just repeat the CSV header).
--- Run once per file, from the data/raw/hdx-hapi-syr/ directory:
---
---   bq load --autodetect --source_format=CSV --skip_leading_rows=1 \
---     crisis_allocator.raw_idps hdx_hapi_idps_syr.csv
---   bq load --autodetect --source_format=CSV --skip_leading_rows=1 \
---     crisis_allocator.raw_operational_presence hdx_hapi_operational_presence_syr.csv
---   bq load --autodetect --source_format=CSV --skip_leading_rows=1 \
---     crisis_allocator.raw_funding hdx_hapi_funding_syr.csv
---   bq load --autodetect --source_format=CSV --skip_leading_rows=1 \
---     crisis_allocator.raw_food_price hdx_hapi_food_price_syr.csv
+-- Raw tables are loaded by bigquery/load_syria_data.sh (bq load
+-- --autodetect against the real downloaded CSVs) -- run that first.
+-- Column reference, confirmed from the real files, not guessed:
 --
 -- (raw_idps columns: location_code, has_hrp, in_gho, provider_admin1_name,
 --  provider_admin2_name, admin1_code, admin1_name, admin2_code,
