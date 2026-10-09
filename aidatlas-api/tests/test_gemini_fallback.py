@@ -62,6 +62,20 @@ def test_429_quota_exhaustion_fails_fast_no_wasted_retries():
     assert client.models.generate_content.call_count == 1
 
 
+def test_generate_rationale_reports_unavailable_vs_empty_dict():
+    """Distinguishes 'Gemini unavailable for the whole run' from 'this
+    particular district just wasn't in the top N' -- caught live: the
+    frontend was showing the same misleading 'outside top-N' message
+    for every district when quota exhaustion meant none of them,
+    including the actual top 10, got rationale.
+    """
+    main.QUOTA_EXHAUSTED = True
+    client = make_fake_client([])
+    result = main.generate_rationale(client, [{"admin2_code": "A", "admin2_name": "A", "admin1_name": "X", "idp_population": 1, "active_org_count": 1, "quantity_allocated": 1.0}], "food")
+    assert result == {}  # bool({}) is False -> caller can tell this apart from a real empty top-N list
+    main.QUOTA_EXHAUSTED = False
+
+
 def test_quota_exhausted_flag_short_circuits_later_calls():
     main.QUOTA_EXHAUSTED = True
     client = make_fake_client([MagicMock(text="should never be reached")])

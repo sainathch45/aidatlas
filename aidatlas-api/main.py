@@ -234,6 +234,12 @@ def allocate(req: AllocationRequest):
 
     top = sorted(districts, key=lambda d: d["quantity_allocated"], reverse=True)[: req.top_n_rationale]
     rationale_by_code = generate_rationale(get_gemini_client(), top, req.resource_type)
+    # Distinguishes "Gemini was unavailable for this whole run" from "this
+    # district just wasn't in the top N narrated" -- without this, every
+    # district showed the same "outside top-N" message even when quota
+    # exhaustion meant NONE of them, including the top 10, got rationale.
+    # Caught directly from how misleading that read in the live UI.
+    rationale_generated = bool(rationale_by_code)
 
     # Deterministic doc id per (resource_type, district) -- NOT including
     # run_id -- so re-running an allocation for the same resource type
@@ -260,6 +266,7 @@ def allocate(req: AllocationRequest):
             "lat": d["lat"],
             "lon": d["lon"],
             "rationale_text": rationale_by_code.get(d["admin2_code"], ""),
+            "rationale_generated": rationale_generated,
         }
         batch.set(fs.collection("allocations").document(doc["allocation_id"]), doc)
         results.append(doc)

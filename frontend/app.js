@@ -122,8 +122,17 @@ function showDistrict(code) {
   document.getElementById("detail-need").textContent = d.need_score ? d.need_score.toFixed(1) : "—";
   document.getElementById("detail-amount").textContent =
     d.quantity_allocated != null ? "$" + d.quantity_allocated.toLocaleString() : "not yet allocated";
-  document.getElementById("detail-rationale").textContent =
-    d.rationale_text || (allocationRun ? "No rationale generated for this district in the current run (outside the top-N narrated)." : "Run an allocation to generate Gemini's rationale for this district.");
+  let rationaleMessage;
+  if (d.rationale_text) {
+    rationaleMessage = d.rationale_text;
+  } else if (!allocationRun) {
+    rationaleMessage = "Run an allocation to generate Gemini's rationale for this district.";
+  } else if (d.rationale_generated === false) {
+    rationaleMessage = "Gemini was unavailable for this entire run (free-tier daily quota reached, or a temporary outage) — no district got AI commentary this run, not just this one. The allocation amount above is still real, computed from BigQuery.";
+  } else {
+    rationaleMessage = "This district wasn't in the top-N narrated this run (Gemini only writes rationale for the largest allocations, to stay within rate limits) — its allocation amount above is still real.";
+  }
+  document.getElementById("detail-rationale").textContent = rationaleMessage;
 
   const marker = markers[code];
   if (marker && map) {
