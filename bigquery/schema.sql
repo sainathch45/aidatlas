@@ -37,8 +37,8 @@ SELECT
   population AS idp_population,
   reference_period_end
 FROM crisis_allocator.raw_idps
-WHERE admin_level = '2'
-  AND reference_period_end = (SELECT MAX(reference_period_end) FROM crisis_allocator.raw_idps WHERE admin_level = '2');
+WHERE admin_level = 2
+  AND reference_period_end = (SELECT MAX(reference_period_end) FROM crisis_allocator.raw_idps WHERE admin_level = 2);
 
 -- Real "existing coverage" signal: how many distinct responding
 -- organizations are already active in each district, across all sectors.

@@ -13,12 +13,14 @@ Local run:
 
 import json
 import os
+import time
 import uuid
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from google import genai
 from google.cloud import bigquery, firestore
+from google.genai import errors as genai_errors
 from pydantic import BaseModel
 
 # No-op in Cloud Run (env vars are injected directly there); picks up
@@ -27,10 +29,9 @@ load_dotenv()
 
 app = FastAPI(title="AidAtlas")
 
-# Confirmed available on the Gemini free tier as of Oct 2026 research; if
-# AI Studio's model picker shows a newer default (e.g. a Gemini 3 Flash
-# variant) when you get your key, swap this.
-GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
+# gemini-2.5-flash is deprecated for new callers as of this session --
+# confirmed live from the API's own 404 error, which pointed us at this.
+GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-3.8-flash")
 PROJECT_ID = os.environ.get("GCP_PROJECT_ID")
 BQ_DATASET = os.environ.get("BIGQUERY_DATASET", "crisis_allocator")
 
@@ -130,18 +131,30 @@ def generate_rationale(client: genai.Client, top_districts: list[dict], resource
         + '\n\nRespond with ONLY a JSON object mapping each admin2_code to its rationale '
         'sentence, e.g. {"SY0800": "..."}. No other text.'
     )
-    response = client.models.generate_content(
-        model=GEMINI_MODEL,
-        contents=prompt,
-        config={"response_mime_type": "application/json"},
-    )
-    try:
-        return json.loads(response.text)
-    except (json.JSONDecodeError, TypeError):
-        # Gemini free tier occasionally wraps JSON in prose despite the
-        # mime type hint -- fail soft with empty rationale rather than
-        # 500ing the whole allocation.
-        return {}
+    # The free tier intermittently 503s under Google's own load (seen
+    # directly while building this). The allocation numbers themselves
+    # come from BigQuery, not Gemini -- so a flaky rationale call should
+    # degrade to empty text, never take down the whole endpoint. This
+    # matters concretely here: the submission rules require the deployed
+    # prototype to stay functional through an unattended judging window.
+    last_error = None
+    for attempt in range(3):
+        try:
+            response = client.models.generate_content(
+                model=GEMINI_MODEL,
+                contents=prompt,
+                config={"response_mime_type": "application/json"},
+            )
+            return json.loads(response.text)
+        except genai_errors.ServerError as exc:
+            last_error = exc
+            time.sleep(2 * (attempt + 1))
+        except (json.JSONDecodeError, TypeError):
+            # Gemini occasionally wraps JSON in prose despite the mime
+            # type hint -- no point retrying a parse failure.
+            return {}
+    print(f"Gemini rationale call failed after retries: {last_error}")
+    return {}
 
 
 class AllocationRequest(BaseModel):
