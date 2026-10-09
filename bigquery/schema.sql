@@ -51,6 +51,21 @@ SELECT
 FROM crisis_allocator.raw_operational_presence
 GROUP BY admin2_code;
 
+-- Real map coordinates: averaged from the food-price dataset's market
+-- lat/lon per district (lat/lon are FLOAT in the real schema already,
+-- no casting needed -- confirmed via `bq show` before writing this).
+-- Covers 48 of 61 IDP-tracked districts; districts with no market
+-- coverage in this dataset get NULL and are deliberately left
+-- unplotted on the frontend map rather than given a fabricated point.
+CREATE OR REPLACE VIEW crisis_allocator.district_centroid AS
+SELECT
+  admin2_code,
+  AVG(lat) AS lat,
+  AVG(lon) AS lon
+FROM crisis_allocator.raw_food_price
+WHERE lat IS NOT NULL AND lon IS NOT NULL AND admin2_code IS NOT NULL
+GROUP BY admin2_code;
+
 -- The view the allocation model actually reads: need per district,
 -- discounted by existing presence. supply_pool_usd is a constant pulled
 -- from the real HSYR26 appeal row (funding_usd), not per-district --
@@ -63,9 +78,13 @@ SELECT
   d.admin2_code,
   d.idp_population,
   COALESCE(p.active_org_count, 0) AS active_org_count,
-  d.idp_population / (1 + COALESCE(p.active_org_count, 0)) AS need_score
+  d.idp_population / (1 + COALESCE(p.active_org_count, 0)) AS need_score,
+  c.lat,
+  c.lon
 FROM crisis_allocator.latest_idps_by_district d
 LEFT JOIN crisis_allocator.org_presence_by_district p
+  USING (admin2_code)
+LEFT JOIN crisis_allocator.district_centroid c
   USING (admin2_code);
 
 -- Output of the allocation model: one row per decision, meant to be the

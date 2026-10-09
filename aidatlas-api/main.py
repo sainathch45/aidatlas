@@ -18,6 +18,7 @@ import uuid
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from google import genai
 from google.cloud import bigquery, firestore
 from google.genai import errors as genai_errors
@@ -28,6 +29,23 @@ from pydantic import BaseModel
 load_dotenv()
 
 app = FastAPI(title="AidAtlas")
+
+# Frontend (Firebase Hosting) and backend (Cloud Run) are different
+# origins, so the browser needs explicit CORS clearance. Kept to a named
+# allowlist rather than "*" since /allocate and /ask are real write/cost
+# paths, not read-only public data.
+ALLOWED_ORIGINS = [
+    "https://ai-builder-cup-aidatlas.web.app",
+    "https://ai-builder-cup-aidatlas.firebaseapp.com",
+    "http://localhost:5000",
+    "http://127.0.0.1:5000",
+]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=ALLOWED_ORIGINS,
+    allow_methods=["GET", "POST"],
+    allow_headers=["Content-Type"],
+)
 
 # gemini-2.5-flash is deprecated for new callers as of this session --
 # confirmed live from the API's own 404 error, which pointed us at this.
@@ -56,6 +74,46 @@ def get_firestore_client() -> firestore.Client:
     return firestore.Client(project=PROJECT_ID)
 
 
+QUOTA_EXHAUSTED = False  # set true on a 429 so later calls skip straight to fallback, no wasted retries
+
+
+def call_gemini(client: genai.Client, prompt: str, json_mode: bool) -> str | None:
+    """Shared retry/fallback wrapper for every Gemini call in this
+    service. Two real failure modes confirmed live while building this,
+    not hypothetical: transient 503s under Google's own load (worth
+    retrying), and the free tier's hard daily quota -- confirmed to be
+    just 20 requests/day for gemini-3.8-flash via a live 429, far
+    tighter than the ~1,000+/day documented for the prior generation.
+    A 429 won't resolve by retrying (the reset is hours away), so it
+    fails fast to fallback rather than burning the retry budget. Either
+    way, callers get None rather than a propagated 500 -- the submission
+    rules require the deployed prototype to survive an unattended
+    judging window, and BigQuery's numbers are real and useful even
+    when Gemini's commentary on top of them isn't available.
+    """
+    global QUOTA_EXHAUSTED
+    if QUOTA_EXHAUSTED:
+        return None
+
+    config = {"response_mime_type": "application/json"} if json_mode else {}
+    last_error = None
+    for attempt in range(3):
+        try:
+            response = client.models.generate_content(model=GEMINI_MODEL, contents=prompt, config=config)
+            return response.text
+        except genai_errors.ServerError as exc:
+            last_error = exc
+            time.sleep(2 * (attempt + 1))
+        except genai_errors.ClientError as exc:
+            if exc.code == 429:
+                QUOTA_EXHAUSTED = True
+                print(f"Gemini daily quota exhausted, switching to fallback mode: {exc}")
+                return None
+            raise
+    print(f"Gemini call failed after retries: {last_error}")
+    return None
+
+
 @app.get("/health")
 def health():
     return {"status": "ok"}
@@ -64,17 +122,16 @@ def health():
 @app.get("/gemini-ping")
 def gemini_ping():
     """Smoke-test the free-tier Gemini key end to end."""
-    client = get_gemini_client()
-    response = client.models.generate_content(
-        model=GEMINI_MODEL,
-        contents="Reply with the single word: ready",
-    )
-    return {"model": GEMINI_MODEL, "reply": response.text}
+    text = call_gemini(get_gemini_client(), "Reply with the single word: ready", json_mode=False)
+    if text is None:
+        raise HTTPException(status_code=503, detail="Gemini unavailable after retries")
+    return {"model": GEMINI_MODEL, "reply": text}
 
 
 def fetch_district_need_scores(bq: bigquery.Client) -> list[dict]:
     query = f"""
-        SELECT admin1_name, admin2_name, admin2_code, idp_population, active_org_count, need_score
+        SELECT admin1_name, admin2_name, admin2_code, idp_population,
+               active_org_count, need_score, lat, lon
         FROM `{PROJECT_ID}.{BQ_DATASET}.district_need_score`
         WHERE need_score IS NOT NULL
         ORDER BY need_score DESC
@@ -94,6 +151,19 @@ def fetch_supply_pool(bq: bigquery.Client, appeal_code: str) -> float:
     )
     rows = list(bq.query(query, job_config=job_config).result())
     return float(rows[0]["funding_usd"]) if rows else 0.0
+
+
+@app.get("/districts")
+def list_districts():
+    """All 61 districts with need-score and (where real data has it)
+    coordinates, independent of any allocation run -- lets the frontend
+    map render immediately on load. 48 of 61 have real coordinates,
+    derived from food-price market locations; the rest come back with
+    lat/lon null rather than a fabricated point.
+    """
+    bq = get_bq_client()
+    districts = fetch_district_need_scores(bq)
+    return {"district_count": len(districts), "with_coordinates": sum(1 for d in districts if d["lat"]), "districts": districts}
 
 
 def compute_proportional_allocation(districts: list[dict], supply_pool: float) -> list[dict]:
@@ -131,30 +201,15 @@ def generate_rationale(client: genai.Client, top_districts: list[dict], resource
         + '\n\nRespond with ONLY a JSON object mapping each admin2_code to its rationale '
         'sentence, e.g. {"SY0800": "..."}. No other text.'
     )
-    # The free tier intermittently 503s under Google's own load (seen
-    # directly while building this). The allocation numbers themselves
-    # come from BigQuery, not Gemini -- so a flaky rationale call should
-    # degrade to empty text, never take down the whole endpoint. This
-    # matters concretely here: the submission rules require the deployed
-    # prototype to stay functional through an unattended judging window.
-    last_error = None
-    for attempt in range(3):
-        try:
-            response = client.models.generate_content(
-                model=GEMINI_MODEL,
-                contents=prompt,
-                config={"response_mime_type": "application/json"},
-            )
-            return json.loads(response.text)
-        except genai_errors.ServerError as exc:
-            last_error = exc
-            time.sleep(2 * (attempt + 1))
-        except (json.JSONDecodeError, TypeError):
-            # Gemini occasionally wraps JSON in prose despite the mime
-            # type hint -- no point retrying a parse failure.
-            return {}
-    print(f"Gemini rationale call failed after retries: {last_error}")
-    return {}
+    text = call_gemini(client, prompt, json_mode=True)
+    if text is None:
+        return {}
+    try:
+        return json.loads(text)
+    except (json.JSONDecodeError, TypeError):
+        # Gemini occasionally wraps JSON in prose despite the mime type
+        # hint -- fail soft, the allocation numbers aren't affected.
+        return {}
 
 
 class AllocationRequest(BaseModel):
@@ -196,6 +251,8 @@ def allocate(req: AllocationRequest):
             "active_org_count": d["active_org_count"],
             "need_score": d["need_score"],
             "quantity_allocated": d["quantity_allocated"],
+            "lat": d["lat"],
+            "lon": d["lon"],
             "rationale_text": rationale_by_code.get(d["admin2_code"], ""),
         }
         batch.set(fs.collection("allocations").document(doc["allocation_id"]), doc)
@@ -222,3 +279,70 @@ def list_allocations(resource_type: str | None = None, run_id: str | None = None
     if run_id:
         query = query.where("run_id", "==", run_id)
     return {"allocations": [doc.to_dict() for doc in query.stream()]}
+
+
+class AskRequest(BaseModel):
+    question: str
+    resource_type: str = "shelter"
+
+
+@app.post("/ask")
+def ask(req: AskRequest):
+    """Natural-language challenge/question over the most recent real
+    allocation -- "why not send more to district X" or "which district
+    has the least coverage" -- answered by Gemini grounded strictly in
+    the real numbers already sitting in Firestore, not invented. This is
+    the coordinator-facing explainability feature the design centers on:
+    every number the answer cites traces back to a real HDX figure.
+    """
+    if not req.question.strip():
+        raise HTTPException(status_code=400, detail="question must not be empty")
+
+    fs = get_firestore_client()
+    docs = (
+        fs.collection("allocations")
+        .where("resource_type", "==", req.resource_type)
+        .order_by("quantity_allocated", direction=firestore.Query.DESCENDING)
+        .limit(20)
+        .stream()
+    )
+    context_rows = [doc.to_dict() for doc in docs]
+    if not context_rows:
+        raise HTTPException(
+            status_code=404,
+            detail=f"No allocation run yet for resource_type={req.resource_type!r} — call /allocate first",
+        )
+
+    context_text = "\n".join(
+        f"- {d['admin2_name']} ({d['admin1_name']}, code {d['admin2_code']}): "
+        f"allocated ${d['quantity_allocated']:,.0f}, IDP population {d['idp_population']:,}, "
+        f"{d['active_org_count']} organizations already active, need_score {d['need_score']:.1f}"
+        for d in context_rows
+    )
+    total_allocated = sum(d["quantity_allocated"] for d in context_rows)
+    prompt = (
+        "You are AidAtlas, assisting a humanitarian coordinator reviewing a real "
+        f"{req.resource_type} aid allocation across Syrian districts, drawn from the real "
+        "2026 HSYR26 Humanitarian Needs and Response Plan (32% funded as of this appeal). "
+        f"Below are the top {len(context_rows)} districts by allocation in the current run "
+        f"(combined ${total_allocated:,.0f} of the total pool):\n\n{context_text}\n\n"
+        f'Coordinator question: "{req.question}"\n\n'
+        "Answer using ONLY the numbers above. If the question references a district not "
+        "listed here, say plainly that it's outside the top districts shown rather than "
+        "guessing at its figures. Be concise (under 90 words), specific, and cite real "
+        "numbers from the list."
+    )
+    answer = call_gemini(get_gemini_client(), prompt, json_mode=False)
+    if answer is None:
+        # Real numbers, not an invented answer: give the coordinator the
+        # same context Gemini would have reasoned over, rather than a
+        # bare error, since the free tier's daily quota can genuinely
+        # run out mid-demo (confirmed live, not hypothetical).
+        answer = (
+            "AI commentary is temporarily unavailable (Gemini's free-tier daily quota, or a transient "
+            f"outage). Here are the real top {len(context_rows)} districts by allocation this run: "
+            + "; ".join(f"{d['admin2_name']} ${d['quantity_allocated']:,.0f}" for d in context_rows[:5])
+            + "."
+        )
+
+    return {"question": req.question, "resource_type": req.resource_type, "answer": answer, "districts_considered": len(context_rows)}

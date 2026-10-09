@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AidAtlas — Command Console</title>
+<meta name="description" content="Gemini-grounded crisis resource allocation, built on real HDX humanitarian data.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧭</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div id="boot">
+  <div id="boot-text"></div>
+</div>
+
+<div id="app" hidden>
+
+  <header id="topbar">
+    <div class="brand">
+      <span class="brand-mark">⬡</span>
+      <div>
+        <h1>AID<span>ATLAS</span></h1>
+        <p class="brand-sub">Ctrl Alt Conquer &middot; Command. Control. Conquer.</p>
+      </div>
+    </div>
+    <div class="stat-strip" id="stat-strip">
+      <div class="stat"><span class="stat-label">Appeal</span><span class="stat-val" id="stat-appeal">HSYR26</span></div>
+      <div class="stat"><span class="stat-label">Funding gap</span><span class="stat-val" id="stat-funded">32% funded</span></div>
+      <div class="stat"><span class="stat-label">Pool</span><span class="stat-val" id="stat-pool">$935,449,756</span></div>
+      <div class="stat"><span class="stat-label">Districts</span><span class="stat-val" id="stat-districts">61</span></div>
+      <div class="stat"><span class="stat-label">Status</span><span class="stat-val" id="stat-status">LIVE DATA — UNALLOCATED</span></div>
+    </div>
+  </header>
+
+  <main id="layout">
+    <section id="map-wrap">
+      <div id="map"></div>
+      <div id="map-legend">
+        <span class="legend-title">NEED SEVERITY</span>
+        <div class="legend-row"><i class="dot sev-0"></i> low</div>
+        <div class="legend-row"><i class="dot sev-1"></i> moderate</div>
+        <div class="legend-row"><i class="dot sev-2"></i> high</div>
+        <div class="legend-row"><i class="dot sev-3"></i> critical</div>
+        <p class="legend-note">48 of 61 districts have real plotted coordinates (food-price market locations). Districts without coverage are listed in the panel, not plotted.</p>
+      </div>
+    </section>
+
+    <aside id="sidebar">
+
+      <div class="panel" id="control-panel">
+        <h2>Resource &amp; Run</h2>
+        <div class="resource-select" id="resource-select">
+          <button class="resource-btn active" data-type="shelter">Shelter</button>
+          <button class="resource-btn" data-type="food">Food</button>
+          <button class="resource-btn" data-type="medicine">Medicine</button>
+        </div>
+        <button id="run-btn">RUN ALLOCATION</button>
+        <p id="run-status" class="run-status"></p>
+      </div>
+
+      <div class="panel" id="detail-panel">
+        <h2>District Detail</h2>
+        <div id="detail-empty" class="detail-empty">Select a marker, or run an allocation, to see a district's real numbers and Gemini's rationale here.</div>
+        <div id="detail-content" hidden>
+          <div class="detail-name" id="detail-name">—</div>
+          <div class="detail-grid">
+            <div><span class="dg-label">IDP population</span><span class="dg-val" id="detail-pop">—</span></div>
+            <div><span class="dg-label">Orgs active</span><span class="dg-val" id="detail-orgs">—</span></div>
+            <div><span class="dg-label">Need score</span><span class="dg-val" id="detail-need">—</span></div>
+            <div><span class="dg-label">Allocated</span><span class="dg-val accent" id="detail-amount">—</span></div>
+          </div>
+          <p class="detail-rationale" id="detail-rationale"></p>
+        </div>
+      </div>
+
+      <div class="panel" id="ask-panel">
+        <h2>Ask AidAtlas</h2>
+        <div id="ask-log"></div>
+        <form id="ask-form">
+          <input id="ask-input" type="text" placeholder="Why not send more to Jebel Saman?" autocomplete="off">
+          <button type="submit">ASK</button>
+        </form>
+        <p class="ask-hint">Answers cite only real figures from the current allocation run — grounded, not invented.</p>
+      </div>
+
+    </aside>
+  </main>
+
+  <footer id="stackbar">
+    <span>Built on</span>
+    <span class="chip">Gemini</span>
+    <span class="chip">Firebase</span>
+    <span class="chip">Firestore</span>
+    <span class="chip">Cloud Run</span>
+    <span class="chip">BigQuery</span>
+    <span class="chip">Google Maps</span>
+    <span class="stackbar-sep">·</span>
+    <span>Data: HDX Humanitarian API, Syria</span>
+  </footer>
+
+</div>
+
+<script src="config.js"></script>
+<script src="app.js"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCu6xIYV6B-yIyoHDzY4PCHwSmrRN5fVZk&callback=initMap&v=weekly" async></script>
+</body>
+</html>
