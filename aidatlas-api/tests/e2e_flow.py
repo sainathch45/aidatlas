@@ -71,6 +71,26 @@ def run(url: str, out_dir: str):
         print(f"   answer: {answer_text!r}")
         assert answer_text.strip(), "ask returned empty answer"
 
+        print("6. Switching crisis region to Myanmar...")
+        page.select_option("#crisis-select", "MMR")
+        page.wait_for_timeout(2000)
+        stat_appeal = page.text_content("#stat-appeal")
+        print(f"   stat-appeal after switch: {stat_appeal!r}")
+        assert "Myanmar" in stat_appeal or "HMMR" in stat_appeal, f"region switch didn't update stats: {stat_appeal!r}"
+        page.screenshot(path=str(out / "5-myanmar-switched.png"))
+
+        print("7. Running allocation for Myanmar...")
+        page.click("#run-btn")
+        page.wait_for_function(
+            "document.getElementById('run-status').textContent.includes('Done') || "
+            "document.getElementById('run-status').textContent.includes('failed')",
+            timeout=60000,
+        )
+        mmr_status = page.text_content("#run-status")
+        print(f"   Myanmar run-status: {mmr_status!r}")
+        assert "failed" not in mmr_status.lower(), f"Myanmar allocation failed: {mmr_status}"
+        page.screenshot(path=str(out / "6-myanmar-allocated.png"))
+
         browser.close()
 
     print(f"\n{len(console_errors)} console error(s) across the whole flow:")

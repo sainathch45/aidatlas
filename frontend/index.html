@@ -45,14 +45,18 @@
         <div class="legend-row"><i class="dot sev-1"></i> moderate</div>
         <div class="legend-row"><i class="dot sev-2"></i> high</div>
         <div class="legend-row"><i class="dot sev-3"></i> critical</div>
-        <p class="legend-note">48 of 61 districts have real plotted coordinates (food-price market locations). Districts without coverage are listed in the panel, not plotted.</p>
+        <p class="legend-note">Coordinates are real (derived from food-price market locations), not fabricated. Locations without coverage are listed in the panel, not plotted.</p>
       </div>
     </section>
 
     <aside id="sidebar">
 
       <div class="panel" id="control-panel">
-        <h2>Resource &amp; Run</h2>
+        <h2>Crisis Region</h2>
+        <select id="crisis-select" class="crisis-select"></select>
+        <p class="crisis-hint">Two genuinely different real data shapes — proves the pipeline is reusable, not hardcoded to one crisis.</p>
+
+        <h2 style="margin-top:16px;">Resource &amp; Run</h2>
         <div class="resource-select" id="resource-select">
           <button class="resource-btn active" data-type="shelter">Shelter</button>
           <button class="resource-btn" data-type="food">Food</button>
@@ -64,12 +68,12 @@
 
       <div class="panel" id="detail-panel">
         <h2>District Detail</h2>
-        <div id="detail-empty" class="detail-empty">Select a marker, or run an allocation, to see a district's real numbers and Gemini's rationale here.</div>
+        <div id="detail-empty" class="detail-empty">Select a marker, or run an allocation, to see a location's real numbers and Gemini's rationale here.</div>
         <div id="detail-content" hidden>
           <div class="detail-name" id="detail-name">—</div>
           <div class="detail-grid">
-            <div><span class="dg-label">IDP population</span><span class="dg-val" id="detail-pop">—</span></div>
-            <div><span class="dg-label">Orgs active</span><span class="dg-val" id="detail-orgs">—</span></div>
+            <div><span class="dg-label" id="detail-pop-label">IDP population</span><span class="dg-val" id="detail-pop">—</span></div>
+            <div><span class="dg-label" id="detail-orgs-label">Orgs active</span><span class="dg-val" id="detail-orgs">—</span></div>
             <div><span class="dg-label">Need score</span><span class="dg-val" id="detail-need">—</span></div>
             <div><span class="dg-label">Allocated</span><span class="dg-val accent" id="detail-amount">—</span></div>
           </div>

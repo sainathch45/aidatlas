@@ -71,7 +71,14 @@ def test_generate_rationale_reports_unavailable_vs_empty_dict():
     """
     main.QUOTA_EXHAUSTED = True
     client = make_fake_client([])
-    result = main.generate_rationale(client, [{"admin2_code": "A", "admin2_name": "A", "admin1_name": "X", "idp_population": 1, "active_org_count": 1, "quantity_allocated": 1.0}], "food")
+    district = {
+        "admin_code": "A",
+        "admin_name": "A",
+        "admin_parent_name": "X",
+        "context": {"idp_population": 1, "active_org_count": 1},
+        "quantity_allocated": 1.0,
+    }
+    result = main.generate_rationale(client, [district], "food", "Syria")
     assert result == {}  # bool({}) is False -> caller can tell this apart from a real empty top-N list
     main.QUOTA_EXHAUSTED = False
 
@@ -92,23 +99,22 @@ def test_ask_falls_back_gracefully_when_gemini_unavailable():
     fake_docs = [
         MagicMock(
             to_dict=lambda: {
-                "admin2_name": "At Tall",
-                "admin1_name": "Rural Damascus",
-                "admin2_code": "SY0304",
+                "admin_name": "At Tall",
+                "admin_parent_name": "Rural Damascus",
+                "admin_code": "SY0304",
                 "quantity_allocated": 133639548.83,
-                "idp_population": 364408,
-                "active_org_count": 21,
                 "need_score": 16564.0,
             }
         )
     ]
     fake_fs = MagicMock()
-    fake_fs.collection.return_value.where.return_value.order_by.return_value.limit.return_value.stream.return_value = fake_docs
+    # Two chained .where() calls now: crisis_region then resource_type.
+    fake_fs.collection.return_value.where.return_value.where.return_value.order_by.return_value.limit.return_value.stream.return_value = fake_docs
 
     with patch.object(main, "get_firestore_client", return_value=fake_fs), patch.object(
         main, "get_gemini_client", return_value=MagicMock()
     ):
-        result = main.ask(main.AskRequest(question="why At Tall?", resource_type="shelter"))
+        result = main.ask(main.AskRequest(question="why At Tall?", crisis_region="SYR", resource_type="shelter"))
 
     assert result["districts_considered"] == 1
     assert "At Tall" in result["answer"]

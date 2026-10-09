@@ -1,14 +1,19 @@
 /* AidAtlas frontend — vanilla JS, no build step, so Firebase Hosting can
  * serve it as-is. Talks to the Cloud Run backend over the URL in config.js.
+ * Supports more than one crisis region (fetched from /crises) to match
+ * the backend's generalized architecture -- switching regions clears
+ * and re-renders the map rather than assuming a fixed district set.
  */
 
 const API = AIDATLAS_CONFIG.API_BASE_URL;
 
 let map;
-let markers = {};       // admin2_code -> google.maps.Marker
-let districtData = {};  // admin2_code -> latest known record (district or allocation row)
+let markers = {};       // admin_code -> google.maps.Marker
+let districtData = {};  // admin_code -> latest known record (district or allocation row)
 let infoWindow;
+let currentCrisisRegion = "SYR";
 let currentResourceType = "shelter";
+let crisisMeta = {};    // code -> {name, map_center, map_zoom, ...} from /crises
 let allocationRun = false;
 
 const DARK_MAP_STYLE = [
@@ -26,7 +31,7 @@ const DARK_MAP_STYLE = [
 
 /* ---------- boot sequence ---------- */
 function boot() {
-  const lines = ["INITIALIZING AIDATLAS", "LOADING REAL HDX DATA — SYRIA 2026", "SYSTEM READY"];
+  const lines = ["INITIALIZING AIDATLAS", "LOADING REAL HDX HUMANITARIAN DATA", "SYSTEM READY"];
   const el = document.getElementById("boot-text");
   let i = 0;
   function next() {
@@ -74,7 +79,7 @@ window.initMap = function initMap() {
   });
   infoWindow = new google.maps.InfoWindow();
   boot();
-  loadDistricts();
+  loadCrises();
 };
 
 async function apiFetch(path, options) {
@@ -86,24 +91,71 @@ async function apiFetch(path, options) {
   return res.json();
 }
 
+async function loadCrises() {
+  try {
+    const data = await apiFetch("/crises");
+    const select = document.getElementById("crisis-select");
+    select.innerHTML = "";
+    data.crises.forEach((c) => {
+      crisisMeta[c.code] = c;
+      const opt = document.createElement("option");
+      opt.value = c.code;
+      opt.textContent = c.name;
+      select.appendChild(opt);
+    });
+    select.value = currentCrisisRegion;
+    select.addEventListener("change", () => switchCrisis(select.value));
+    await switchCrisis(currentCrisisRegion);
+  } catch (err) {
+    setRunStatus("Could not load crisis list: " + err.message, true);
+  }
+}
+
+function clearMarkers() {
+  Object.values(markers).forEach((m) => m.setMap(null));
+  markers = {};
+  districtData = {};
+}
+
+async function switchCrisis(code) {
+  currentCrisisRegion = code;
+  const meta = crisisMeta[code];
+  clearMarkers();
+  allocationRun = false;
+  document.getElementById("detail-empty").hidden = false;
+  document.getElementById("detail-content").hidden = true;
+  document.getElementById("ask-log").innerHTML = "";
+
+  if (meta) {
+    map.setCenter(meta.map_center);
+    map.setZoom(meta.map_zoom);
+    document.getElementById("stat-appeal").textContent = `${meta.appeal_code} (${meta.name})`;
+    document.getElementById("stat-status").textContent = "LIVE DATA — UNALLOCATED";
+    document.getElementById("stat-status").classList.remove("allocated");
+    document.getElementById("stat-pool").textContent = "—";
+    document.getElementById("stat-funded").textContent = `${meta.funding_pct}% funded`;
+  }
+  await loadDistricts();
+}
+
 async function loadDistricts() {
   try {
-    const data = await apiFetch("/districts");
+    const data = await apiFetch(`/districts?crisis_region=${currentCrisisRegion}&resource_type=${currentResourceType}`);
     document.getElementById("stat-districts").textContent =
       `${data.district_count} (${data.with_coordinates} mapped)`;
     const maxNeed = Math.max(...data.districts.map((d) => d.need_score));
     data.districts.forEach((d) => {
-      districtData[d.admin2_code] = d;
+      districtData[d.admin_code] = d;
       if (d.lat == null || d.lon == null) return;
       const sev = severityBucket(d.need_score, maxNeed);
       const marker = new google.maps.Marker({
         position: { lat: d.lat, lng: d.lon },
         map,
         icon: markerIcon(sev, false),
-        title: `${d.admin2_name} (${d.admin1_name})`,
+        title: `${d.admin_name} (${d.admin_parent_name})`,
       });
-      marker.addListener("click", () => showDistrict(d.admin2_code));
-      markers[d.admin2_code] = marker;
+      marker.addListener("click", () => showDistrict(d.admin_code));
+      markers[d.admin_code] = marker;
     });
   } catch (err) {
     setRunStatus("Could not load district data: " + err.message, true);
@@ -116,27 +168,46 @@ function showDistrict(code) {
   document.getElementById("detail-empty").hidden = true;
   const content = document.getElementById("detail-content");
   content.hidden = false;
-  document.getElementById("detail-name").textContent = `${d.admin2_name} — ${d.admin1_name}`;
-  document.getElementById("detail-pop").textContent = (d.idp_population ?? 0).toLocaleString();
-  document.getElementById("detail-orgs").textContent = d.active_org_count ?? "—";
+  document.getElementById("detail-name").textContent = `${d.admin_name} — ${d.admin_parent_name}`;
+
+  // Context shape varies by crisis: Syria gives IDP population + org
+  // count regardless of resource type; Myanmar gives a sector-specific
+  // "people in need" figure instead. Both real, just different real
+  // signals -- render whichever this crisis actually has.
+  const ctx = d.context || {};
+  if ("idp_population" in ctx) {
+    document.getElementById("detail-pop-label").textContent = "IDP population";
+    document.getElementById("detail-pop").textContent = (ctx.idp_population ?? 0).toLocaleString();
+    document.getElementById("detail-orgs-label").textContent = "Orgs active";
+    document.getElementById("detail-orgs").textContent = ctx.active_org_count ?? "—";
+  } else {
+    document.getElementById("detail-pop-label").textContent = "People in need";
+    document.getElementById("detail-pop").textContent = (ctx.people_in_need ?? d.need_score ?? 0).toLocaleString();
+    document.getElementById("detail-orgs-label").textContent = "Sector";
+    document.getElementById("detail-orgs").textContent = ctx.sector ?? "—";
+  }
   document.getElementById("detail-need").textContent = d.need_score ? d.need_score.toFixed(1) : "—";
   document.getElementById("detail-amount").textContent =
     d.quantity_allocated != null ? "$" + d.quantity_allocated.toLocaleString() : "not yet allocated";
+
   let rationaleMessage;
   if (d.rationale_text) {
     rationaleMessage = d.rationale_text;
   } else if (!allocationRun) {
-    rationaleMessage = "Run an allocation to generate Gemini's rationale for this district.";
+    rationaleMessage = "Run an allocation to generate Gemini's rationale for this location.";
   } else if (d.rationale_generated === false) {
-    rationaleMessage = "Gemini was unavailable for this entire run (free-tier daily quota reached, or a temporary outage) — no district got AI commentary this run, not just this one. The allocation amount above is still real, computed from BigQuery.";
+    rationaleMessage = "Gemini was unavailable for this entire run (free-tier daily quota reached, or a temporary outage) — no location got AI commentary this run, not just this one. The allocation amount above is still real, computed from BigQuery.";
   } else {
-    rationaleMessage = "This district wasn't in the top-N narrated this run (Gemini only writes rationale for the largest allocations, to stay within rate limits) — its allocation amount above is still real.";
+    rationaleMessage = "This location wasn't in the top-N narrated this run (Gemini only writes rationale for the largest allocations, to stay within rate limits) — its allocation amount above is still real.";
   }
   document.getElementById("detail-rationale").textContent = rationaleMessage;
 
   const marker = markers[code];
   if (marker && map) {
-    infoWindow.setContent(`<strong>${d.admin2_name}</strong><br>${d.idp_population?.toLocaleString() ?? "—"} IDPs`);
+    const popText = "idp_population" in ctx
+      ? `${ctx.idp_population?.toLocaleString() ?? "—"} IDPs`
+      : `${(ctx.people_in_need ?? d.need_score ?? 0).toLocaleString()} in need`;
+    infoWindow.setContent(`<strong>${d.admin_name}</strong><br>${popText}`);
     infoWindow.open(map, marker);
   }
 }
@@ -157,6 +228,14 @@ document.addEventListener("DOMContentLoaded", () => {
       document.querySelectorAll(".resource-btn").forEach((b) => b.classList.remove("active"));
       btn.classList.add("active");
       currentResourceType = btn.dataset.type;
+      // Myanmar's need-score is sector-specific, so switching resource
+      // type genuinely changes which locations rank highest -- reload
+      // rather than just relabeling.
+      clearMarkers();
+      allocationRun = false;
+      document.getElementById("detail-empty").hidden = false;
+      document.getElementById("detail-content").hidden = true;
+      loadDistricts();
     });
   });
 
@@ -180,11 +259,15 @@ async function runAllocation() {
     const data = await apiFetch("/allocate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ resource_type: currentResourceType, top_n_rationale: 10 }),
+      body: JSON.stringify({
+        crisis_region: currentCrisisRegion,
+        resource_type: currentResourceType,
+        top_n_rationale: 10,
+      }),
     });
 
     data.allocations.forEach((d) => {
-      districtData[d.admin2_code] = { ...districtData[d.admin2_code], ...d };
+      districtData[d.admin_code] = { ...districtData[d.admin_code], ...d };
     });
     const maxAmount = Math.max(...data.allocations.map((d) => d.quantity_allocated));
     repaintMarkers(maxAmount);
@@ -196,9 +279,9 @@ async function runAllocation() {
     allocationRun = true;
 
     const top = [...data.allocations].sort((a, b) => b.quantity_allocated - a.quantity_allocated)[0];
-    showDistrict(top.admin2_code);
+    showDistrict(top.admin_code);
 
-    setRunStatus(`Done — ${data.district_count} districts allocated, top 10 narrated by Gemini.`);
+    setRunStatus(`Done — ${data.district_count} locations allocated, top 10 narrated by Gemini.`);
   } catch (err) {
     setRunStatus("Allocation failed: " + err.message, true);
     document.getElementById("stat-status").textContent = "ERROR";
@@ -230,7 +313,11 @@ async function submitAsk(e) {
     const data = await apiFetch("/ask", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ question, resource_type: currentResourceType }),
+      body: JSON.stringify({
+        question,
+        crisis_region: currentCrisisRegion,
+        resource_type: currentResourceType,
+      }),
     });
     aEl.classList.remove("loading");
     aEl.textContent = data.answer;

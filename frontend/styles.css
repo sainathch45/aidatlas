@@ -90,6 +90,13 @@ body{
   text-transform:uppercase; color:var(--ink-dim); font-weight:600;
 }
 
+.crisis-select{
+  width:100%; background:var(--bg); border:1px solid var(--border); color:var(--ink);
+  padding:9px 10px; border-radius:5px; font-family:var(--mono); font-size:12.5px; cursor:pointer;
+}
+.crisis-select:focus{outline:1px solid var(--accent);}
+.crisis-hint{font-size:10px; color:var(--ink-dim); margin:6px 0 0; line-height:1.4;}
+
 .resource-select{display:flex; gap:6px; margin-bottom:10px;}
 .resource-btn{
   flex:1; background:transparent; border:1px solid var(--border); color:var(--ink-dim);
