@@ -5,3 +5,5 @@ __pycache__/
 data/raw/
 node_modules/
 *.log
+.firebase/
+.pytest_cache/

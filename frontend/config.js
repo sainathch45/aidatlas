@@ -3,6 +3,6 @@
 // restriction set on the key in the Cloud Console, not secrecy here.
 // Backend keys (Gemini, service accounts) never go in this file.
 const AIDATLAS_CONFIG = {
-  API_BASE_URL: "http://127.0.0.1:8080",
+  API_BASE_URL: "https://aidatlas-api-866617346749.asia-southeast1.run.app",
   GOOGLE_MAPS_API_KEY: "AIzaSyCu6xIYV6B-yIyoHDzY4PCHwSmrRN5fVZk",
 };
