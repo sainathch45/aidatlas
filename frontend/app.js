@@ -37,7 +37,7 @@ function boot() {
     }
     el.textContent = lines[i];
     i++;
-    setTimeout(next, 420);
+    setTimeout(next, 950);
   }
   next();
 }

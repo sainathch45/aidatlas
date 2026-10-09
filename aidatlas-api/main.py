@@ -1,14 +1,19 @@
 """AidAtlas — crisis resource allocator backend.
 
-Deploys to Cloud Run. Calls the free-tier Gemini Developer API directly
-(no Agent Platform needed for this), reads district need-scores from
-BigQuery (see bigquery/schema.sql), and writes/reads the resulting
-allocations + rationale through Firestore for the live dashboard/map.
+Deploys to Cloud Run. Calls Gemini via Vertex AI / Gemini Enterprise
+Agent Platform (not the plain Gemini Developer API -- switched after an
+independent review flagged the Developer API free tier's 20
+requests/day cap as the single biggest live-demo risk; Vertex AI uses
+the same already-Blaze-enabled project with no separate quota wall).
+Reads district need-scores from BigQuery (see bigquery/schema.sql), and
+writes/reads the resulting allocations + rationale through Firestore
+for the live dashboard/map.
 
 Local run:
     pip install -r requirements.txt
     uvicorn main:app --reload --port 8080
-    (reads GEMINI_API_KEY etc. from .env via python-dotenv)
+    (needs `gcloud auth application-default login` done once locally;
+    Cloud Run uses its attached service account instead)
 """
 
 import json
@@ -51,6 +56,7 @@ app.add_middleware(
 # confirmed live from the API's own 404 error, which pointed us at this.
 GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-3.8-flash")
 PROJECT_ID = os.environ.get("GCP_PROJECT_ID")
+VERTEX_LOCATION = os.environ.get("AGENT_PLATFORM_LOCATION", "global")
 BQ_DATASET = os.environ.get("BIGQUERY_DATASET", "crisis_allocator")
 
 # Real HSYR26 appeal row confirmed in data/raw/hdx-hapi-syr/hdx_hapi_funding_syr.csv.
@@ -60,10 +66,10 @@ SYRIA_APPEAL_CODE = "HSYR26"
 
 
 def get_gemini_client() -> genai.Client:
-    api_key = os.environ.get("GEMINI_API_KEY")
-    if not api_key:
-        raise HTTPException(status_code=500, detail="GEMINI_API_KEY not set")
-    return genai.Client(api_key=api_key)
+    # Vertex AI mode: authenticates via Application Default Credentials
+    # (the Cloud Run service's attached service account in prod, or
+    # `gcloud auth application-default login` locally) -- no API key.
+    return genai.Client(vertexai=True, project=PROJECT_ID, location=VERTEX_LOCATION)
 
 
 def get_bq_client() -> bigquery.Client:
