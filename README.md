@@ -1,45 +1,75 @@
-# Crisis Resource Allocator — Ctrl Alt Conquer
+# AidAtlas
 
-Google Cloud AI Builder Cup, JAPAC 2026 — Sustainability & Social Impact track.
+**Google Cloud AI Builder Cup, JAPAC 2026 — Sustainability & Social Impact track**
+Team Ctrl Alt Conquer — Command. Control. Conquer.
 
-Gemini generates a defensible, plain-language rationale for how aid (food, medicine, shelter) should be allocated across locations in a real crisis, on top of a real allocation model running over real HDX humanitarian data.
+Gemini-grounded crisis resource allocation, built on real Humanitarian Data Exchange (HDX) data for Syria's 2026 Humanitarian Needs and Response Plan (HSYR26) — currently **32% funded** against $2,922,184,830 required.
 
-## Is free tier actually possible? (checked 2026-10-09)
+**Live:**
+- App: https://ai-builder-cup-aidatlas.web.app
+- API: https://aidatlas-api-866617346749.asia-southeast1.run.app
 
-Short answer: **yes for cost, with one unavoidable exception.** Every service below can run at $0 actual spend. The one thing that cannot be avoided is that Cloud Run — mandatory for this hackathon — requires a billing account with a payment method attached, even though you will not be charged as long as usage stays inside the Always Free quota (2,000,000 requests/month, far beyond what a demo needs).
+## What it does
 
-| Service | Needs a card attached? | What you actually get free |
-|---|---|---|
-| Gemini Developer API (via AI Studio key) | No | Flash / Flash-Lite models only — Pro models were moved behind billing as of an April 2026 policy change. ~1,000–1,500 requests/day, 10–15 req/min. Plenty for a demo; use Flash for the reasoning layer. |
-| Firestore (Firebase Spark plan) | No | 1 GiB storage, 50k reads/day, 20k writes/day, 20k deletes/day, 10 GiB egress/month. |
-| Firebase Hosting (Spark plan) | No | Standard free static hosting quota. |
-| BigQuery | No, if you stay in **Sandbox mode** | 1 TiB processed queries/month, 10 GiB storage — same limits as the billed free tier, just with tables auto-expiring after 60 days (fine for a 9-day build) and no streaming inserts. |
-| Cloud Run | **Yes** | 2M requests/month, 360k GB-seconds, 180k vCPU-seconds free — but Google requires a Blaze (pay-as-you-go) billing account to deploy at all, by policy, independent of hackathon credits. |
-| Cloud Functions | Yes (Blaze) | Not needed — Cloud Run covers the backend requirement, skip this entirely. |
-| HDX data access | No, ever | Fully open reads, no account or token needed for downloading datasets. |
+AidAtlas splits the real, currently-available $935,449,756 HSYR26 funding pool across 61 real Syrian districts, weighted by a need score (real IDP population, discounted by how many organizations are already active there, from HDX's operational-presence data) — then asks Gemini to write a plain-language, numbers-grounded rationale for each allocation. A coordinator can also challenge any result in natural language ("why not send more to district X?") and get an answer that cites only real figures already in the system, never invented ones.
 
-**Open question for the two of you:** do either of you have a credit/debit card you're willing to attach to a fresh GCP project? This is a Google account-verification requirement, not an expected cost — but it is non-negotiable for Cloud Run, which the submission rules require by name. Everything else in this repo can be built and tested today without resolving this.
+The differentiating bet here isn't a fancier optimizer — it's **explainability over raw optimality**: every dollar allocated comes with a defensible reason a coordinator could show a donor or auditor, not just a number.
 
-## Dataset: HDX, no synthetic data needed for the core signal
+## Why this fits the brief
 
-[HDX HAPI](https://data.humdata.org/hapi) (the Humanitarian Data Exchange's harmonized API) standardizes food security, displacement, and funding indicators across ~25 real humanitarian operations — exactly the three resource-adjacent signals this project needs, already aligned to the same locations. No account needed; reading it requires only a free `app_identifier` (see `data/README.md`).
+- **Problem Alignment & Impact**: real crisis (Syria 2026 appeal), real funding gap, real district-level displacement data — not a synthetic demo.
+- **Technical Merit & Gen AI Implementation**: a real multi-service Google Cloud pipeline (BigQuery → Gemini → Firestore → Cloud Run → Firebase Hosting), not a single-call LLM wrapper. Gemini is used for structured, grounded generation (JSON-mode rationale, NL Q&A over real stored data) with production-hardened retry/fallback behavior discovered and fixed live during development (see commit history).
+- **Innovation & Creativity**: explainability-first framing, natural-language "ask" interrogation of a live allocation, a command-ops UI built around the real data rather than a generic dashboard template.
+- **UX**: dark command-console interface, Google Maps with real district coordinates (48/61 derived from HDX's own food-price market locations), live stat strip, resource-type switching, zero fabricated map points.
 
-Rather than guess at the beta API's exact endpoint paths, the ingestion script here starts from HDX's own **pre-packaged per-country HAPI CSV exports** — confirmed live dataset pages exist for at least Syria (`hdx-hapi-syr`), Iraq (`hdx-hapi-irq`), Haiti (`hdx-hapi-hti`), Ethiopia (`hdx-hapi-eth`), and Somalia (`hdx-hapi-som`). Pick one (criteria below), download via the standard CKAN API (no auth), and the live HAPI API becomes an optional upgrade later for fresher data.
+## Google Cloud stack actually used
 
-**How to pick the region:** open each candidate's dataset page on data.humdata.org, and prefer whichever has location data down to admin1/admin2 (state/province) level with recent (last 6–12 months) food security and displacement figures — that granularity is what makes the allocation model's "locations" meaningful instead of one giant national blob.
+| Service | What it does here |
+|---|---|
+| **Gemini** (Developer API, `gemini-3.8-flash`) | Generates per-district allocation rationale (batched, JSON mode) and answers natural-language coordinator questions, grounded in real Firestore data |
+| **BigQuery** | Hosts the raw HDX tables and the `district_need_score` view (need = IDP population discounted by existing org presence) that the allocation model reads |
+| **Firestore** | Live state store for every allocation run — what the frontend map and Ask feature read from |
+| **Cloud Run** | Hosts the FastAPI backend (`aidatlas-api/`) |
+| **Firebase Hosting** | Serves the frontend (`frontend/`) |
+| **Google Maps JavaScript API** | District map, dark-styled, real coordinates |
 
 ## Repo layout
 
 ```
-data/           HDX ingestion — run first, needs zero cloud setup
-bigquery/       Schema for the allocation model's source tables
-aidatlas-api/   FastAPI service — becomes the Cloud Run deployment
+data/           HDX ingestion (data/fetch_hdx_dataset.py) -- the real Syria CSVs
+bigquery/       Schema + views (schema.sql) + load script (load_syria_data.sh)
+aidatlas-api/   FastAPI backend, deployed to Cloud Run; tests/ has the full suite
+frontend/       Vanilla JS dashboard, deployed to Firebase Hosting
 ```
 
-## Setup order
+## Running it yourself
 
-1. **Today, no account needed:** run `data/fetch_hdx_dataset.py` against one or two candidate country datasets, inspect the real CSV columns, confirm the region choice.
-2. **Today, no card needed:** get a free Gemini API key at [aistudio.google.com](https://aistudio.google.com) — works immediately on the free tier.
-3. **Today, no card needed:** create a Firebase project at [console.firebase.google.com](https://console.firebase.google.com) on the Spark (free) plan; enable Firestore.
-4. **Today, no card needed:** in the Google Cloud Console, open BigQuery for the same project and start in Sandbox mode; load the real CSV once step 1 confirms the schema.
-5. **Blocked on the card question above:** upgrade the project to Blaze and deploy `aidatlas-api/` to Cloud Run. Nothing else in the build depends on this happening first — do it whenever the card question is resolved.
+```
+cd data && pip install -r requirements.txt && python fetch_hdx_dataset.py hdx-hapi-syr
+bash ../bigquery/load_syria_data.sh
+bq query --use_legacy_sql=false < ../bigquery/schema.sql
+
+cd ../aidatlas-api
+python -m venv .venv && .venv/Scripts/activate
+pip install -r requirements.txt
+cp .env.example .env   # fill in GEMINI_API_KEY (see .env.example for the free-tier gotcha)
+uvicorn main:app --reload --port 8080
+```
+
+Frontend: serve `frontend/` with any static file server, pointed at your backend via `frontend/config.js`.
+
+## Tests
+
+```
+cd aidatlas-api
+pip install -r requirements-dev.txt
+pytest tests/ -v                                        # unit tests, no credentials needed
+python tests/smoke_test_live.py <backend-url>            # full live endpoint coverage
+python tests/e2e_flow.py <frontend-url> <screenshot-dir> # Playwright: load, allocate, click, ask
+```
+
+## Honest notes, not overclaimed
+
+- 48 of 61 districts have real plotted map coordinates (derived from HDX's food-price market locations); the remaining 13 are listed in data, not given a fabricated point.
+- Gemini's free tier caps at 20 requests/day for `gemini-3.8-flash` (confirmed live, not documented anywhere obvious beforehand) — both `/allocate` and `/ask` degrade gracefully to real BigQuery/Firestore numbers without Gemini commentary if that's exhausted, rather than failing.
+- The allocation model is a simple, explainable proportional split by need score, not a constrained optimizer — a deliberate choice, see "Why this fits the brief" above.
