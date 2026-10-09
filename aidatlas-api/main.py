@@ -309,7 +309,9 @@ def generate_rationale(client: genai.Client, top_districts: list[dict], resource
         f"across {crisis_name}, drawn from a real, currently active humanitarian response "
         "plan. For each location below, write one plain-language sentence (max 30 words) "
         "explaining WHY it received this allocation, citing the real figures given. "
-        "Be specific to the numbers given, not generic.\n\n"
+        "Be specific to the numbers given, not generic. Plain prose only -- no markdown "
+        "formatting (no asterisks, no bullet points, no headers), since this renders as "
+        "plain text in the UI.\n\n"
         "Locations:\n"
         + "\n".join(format_district_line(d) for d in top_districts)
         + '\n\nRespond with ONLY a JSON object mapping each admin_code to its rationale '
@@ -465,7 +467,8 @@ def ask(req: AskRequest):
         "Answer using ONLY the numbers above. If the question references a location not "
         "listed here, say plainly that it's outside the top locations shown rather than "
         "guessing at its figures. Be concise (under 90 words), specific, and cite real "
-        "numbers from the list."
+        "numbers from the list. Plain prose only -- no markdown formatting (no asterisks, "
+        "no bullet points, no headers), since this renders as plain text in the UI."
     )
     answer = call_gemini(get_gemini_client(), prompt, json_mode=False)
     if answer is None:

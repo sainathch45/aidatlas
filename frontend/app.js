@@ -10,7 +10,7 @@ const API = AIDATLAS_CONFIG.API_BASE_URL;
 let map;
 let markers = {};       // admin_code -> google.maps.Marker
 let districtData = {};  // admin_code -> latest known record (district or allocation row)
-let infoWindow;
+let selectedCode = null; // the marker currently shown in the sidebar, highlighted on the map
 let currentCrisisRegion = "SYR";
 let currentResourceType = "shelter";
 let crisisMeta = {};    // code -> {name, map_center, map_zoom, ...} from /crises
@@ -57,15 +57,19 @@ function severityBucket(needScore, maxNeed) {
 }
 const SEV_COLOR = ["#3ad6ff", "#ffd23a", "#ff9a3a", "#ff5d5d"];
 
-function markerIcon(sev, highlighted) {
-  const r = highlighted ? 11 : 7 + sev * 1.5;
+function markerIcon(sev, selected) {
   return {
     path: google.maps.SymbolPath.CIRCLE,
-    scale: r,
+    scale: selected ? 12 : 7 + sev * 1.5,
     fillColor: SEV_COLOR[sev],
-    fillOpacity: 0.9,
-    strokeColor: "#061018",
-    strokeWeight: 2,
+    fillOpacity: selected ? 1 : 0.9,
+    // Selected marker gets a bright accent ring instead of the usual dark
+    // outline -- the map's own selection indicator, now that detail lives
+    // only in the sidebar panel (removed the native InfoWindow popup: it
+    // couldn't be fully restyled to match the dark theme and duplicated
+    // the sidebar anyway).
+    strokeColor: selected ? "#3ad6ff" : "#061018",
+    strokeWeight: selected ? 3 : 2,
   };
 }
 
@@ -77,7 +81,6 @@ window.initMap = function initMap() {
     disableDefaultUI: true,
     zoomControl: true,
   });
-  infoWindow = new google.maps.InfoWindow();
   boot();
   loadCrises();
 };
@@ -115,6 +118,7 @@ function clearMarkers() {
   Object.values(markers).forEach((m) => m.setMap(null));
   markers = {};
   districtData = {};
+  selectedCode = null;
 }
 
 async function switchCrisis(code) {
@@ -202,14 +206,30 @@ function showDistrict(code) {
   }
   document.getElementById("detail-rationale").textContent = rationaleMessage;
 
-  const marker = markers[code];
-  if (marker && map) {
-    const popText = "idp_population" in ctx
-      ? `${ctx.idp_population?.toLocaleString() ?? "—"} IDPs`
-      : `${(ctx.people_in_need ?? d.need_score ?? 0).toLocaleString()} in need`;
-    infoWindow.setContent(`<strong>${d.admin_name}</strong><br>${popText}`);
-    infoWindow.open(map, marker);
+  highlightSelected(code);
+}
+
+function highlightSelected(code) {
+  // Repaints just the old and new selected markers rather than the
+  // whole set -- cheap, and keeps everyone else's severity color intact.
+  if (selectedCode && markers[selectedCode]) {
+    const prev = districtData[selectedCode];
+    const prevSev = severityBucket(prev.quantity_allocated ?? prev.need_score, currentMaxValue());
+    markers[selectedCode].setIcon(markerIcon(prevSev, false));
   }
+  selectedCode = code;
+  const marker = markers[code];
+  if (marker) {
+    const d = districtData[code];
+    const sev = severityBucket(d.quantity_allocated ?? d.need_score, currentMaxValue());
+    marker.setIcon(markerIcon(sev, true));
+    marker.setZIndex(999);
+  }
+}
+
+function currentMaxValue() {
+  const values = Object.values(districtData).map((d) => d.quantity_allocated ?? d.need_score ?? 0);
+  return values.length ? Math.max(...values) : 0;
 }
 
 function repaintMarkers(maxAmount) {
@@ -217,7 +237,8 @@ function repaintMarkers(maxAmount) {
     const marker = markers[code];
     if (!marker) return;
     const sev = severityBucket(d.quantity_allocated ?? 0, maxAmount);
-    marker.setIcon(markerIcon(sev, false));
+    marker.setIcon(markerIcon(sev, code === selectedCode));
+    if (code === selectedCode) marker.setZIndex(999);
   });
 }
 
