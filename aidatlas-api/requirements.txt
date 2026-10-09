@@ -1,0 +1,6 @@
+fastapi>=0.115
+uvicorn[standard]>=0.30
+google-genai>=0.5
+google-cloud-bigquery>=3.25
+google-cloud-firestore>=2.18
+pydantic>=2.8
