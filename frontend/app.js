@@ -252,7 +252,10 @@ function setRunStatus(text, isError) {
 async function runAllocation() {
   const btn = document.getElementById("run-btn");
   btn.disabled = true;
-  setRunStatus("Querying BigQuery, computing allocation, asking Gemini for rationale…");
+  // Vertex AI's response latency is genuinely variable -- observed
+  // 3-80+ seconds live for the same batched rationale call -- so this
+  // sets an honest expectation instead of looking stuck with no context.
+  setRunStatus("Querying BigQuery, computing allocation, asking Gemini for rationale… this can take up to a minute.");
   document.getElementById("stat-status").textContent = "ALLOCATING…";
 
   try {
