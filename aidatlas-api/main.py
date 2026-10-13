@@ -37,6 +37,8 @@ from google.cloud import bigquery, firestore
 from google.genai import errors as genai_errors
 from pydantic import BaseModel
 
+from optimizer import optimize_dispatch
+
 # No-op in Cloud Run (env vars are injected directly there); picks up
 # aidatlas-api/.env for local runs.
 load_dotenv()
@@ -274,6 +276,23 @@ def fetch_district_need_scores(bq: bigquery.Client, crisis_region: str, resource
                     "metric_value": d["value"],
                     "note": d.get("note", ""),
                     "sources": briefing["sources"],
+                    # Computed live from Earth Engine satellite data (CHIRPS/
+                    # MODIS), not cited -- kept as a separate, parallel real
+                    # signal rather than silently folded into need_score,
+                    # since it doesn't always agree with the cited figure
+                    # (different time windows/methodology -- both real,
+                    # worth surfacing rather than picking one silently).
+                    "satellite": d.get("satellite"),
+                    # Path B: Sentinel-1 SAR change-detection flood extent,
+                    # Assam only (a drought has no "flood extent" to measure) --
+                    # a second, methodologically distinct live satellite signal
+                    # alongside the CHIRPS/MODIS one above.
+                    "flood_extent": d.get("flood_extent"),
+                    # Real road-network signal from Google Routes API (see
+                    # optimizer.py / data/fetch_road_chokepoints.py) -- feeds
+                    # the dispatch optimizer's network_multiplier, not just
+                    # narration.
+                    "chokepoint": d.get("chokepoint"),
                 },
             }
             for d in briefing["districts"]
@@ -352,6 +371,43 @@ def format_district_line(d: dict) -> str:
         detail = f"{ctx['metric_label']}={ctx['metric_value']}"
         if ctx.get("note"):
             detail += f" ({ctx['note']})"
+        sat = ctx.get("satellite")
+        if sat:
+            # Live-computed from Earth Engine, separate from the cited
+            # figure above -- may agree or diverge (both real, different
+            # windows/methodology); let Gemini see and reason about both
+            # rather than silently picking one.
+            sat_bits = ", ".join(f"{k}={v}" for k, v in sat.items() if k not in ("note", "window"))
+            detail += f"; live satellite data ({sat.get('window', '')}): {sat_bits}"
+            if sat.get("note"):
+                detail += f" [{sat['note']}]"
+        flood = ctx.get("flood_extent")
+        if flood:
+            # Path B: a second, methodologically distinct live satellite
+            # signal (Sentinel-1 radar flood-water detection vs. the
+            # CHIRPS/MODIS optical signal above) -- only present for flood
+            # crises, where it directly answers "how much is underwater."
+            detail += (
+                f"; live SAR flood-extent data ({flood.get('post_window', '')}): "
+                f"flooded_area_pct={flood['flooded_area_pct_live']} within {flood['radius_km']}km of the HQ point"
+                f" [{flood['note']}]"
+            )
+        choke = ctx.get("chokepoint")
+        if choke and choke.get("chokepoint_for"):
+            # Real driving routes from Google Routes API: this district
+            # sits on the actual road corridor serving the named others,
+            # so it matters to the dispatch plan beyond its own need_score.
+            detail += (
+                f"; real road data: this district's delivery route also serves "
+                f"{', '.join(choke['chokepoint_for'])} ({choke['route_from_hub_min']:.0f} min from the "
+                f"{choke['hub']} supply hub)"
+            )
+    if d.get("units_allocated") is not None:
+        return (
+            f"{base}, {detail}, solver_allocated_units={d['units_allocated']}"
+            f" (network_multiplier={d.get('network_multiplier', 1.0)}, access_factor={d.get('access_factor', 1.0)}),"
+            f" priority_rank={d.get('priority_rank', '?')}"
+        )
     if d.get("quantity_allocated") is not None:
         return f"{base}, {detail}, allocated_usd={d['quantity_allocated']:,.0f}"
     return f"{base}, {detail}, priority_rank={d.get('priority_rank', '?')}"
@@ -381,11 +437,25 @@ def generate_rationale(
         # explicit, or the output could misleadingly read as official.
         task = (
             f"You are drafting a PROPOSED, NON-OFFICIAL {resource_type} relief priority ranking "
-            f"for {crisis_name}, based on real public reporting (cited figures below) since no "
-            "formal government-coordinated response plan exists for this crisis yet. For each "
-            "location below, write one plain-language sentence (max 30 words) explaining why it "
-            "ranks where it does, citing the real figure given. Do not imply this is an official "
-            "or funded allocation -- frame it as a draft recommendation only."
+            f"for {crisis_name}, based on real public reporting and, where given, live satellite "
+            "data computed directly from Earth Engine -- either optical (CHIRPS precipitation, "
+            "MODIS vegetation index) or, for flood locations, Sentinel-1 radar flood-extent "
+            "data (flooded_area_pct, a direct measurement of how much ground near that location "
+            "is underwater right now) -- since no formal government-coordinated response plan "
+            "exists for this crisis yet. For each location, write one plain-language sentence "
+            "(max 30 words) explaining why it ranks where it does. Where satellite data is given "
+            "alongside the cited figure, weave in whichever is most informative -- if they agree, "
+            "that's useful corroboration; if they diverge, say so plainly rather than ignoring it, "
+            "since both are real measurements of different things (e.g. a local satellite window "
+            "or a small radius around a point vs. a broader reported period or district-wide "
+            "figure). When a location shows solver_allocated_units, that number is the output of "
+            "a real constrained optimizer (Google OR-Tools), not a guess -- explain it using the "
+            "two real factors that shaped it: network_multiplier (>1 means this location sits on "
+            "the real road route serving other high-need locations too, per Google Routes API, so "
+            "prioritizing it has a knock-on benefit) and access_factor (<1 means live radar-measured "
+            "flooding is physically limiting how much can be delivered there, not low priority). Do "
+            "not imply this is an official or funded allocation -- frame it as a draft "
+            "recommendation only."
         )
     prompt = (
         task
@@ -425,6 +495,12 @@ class AllocationRequest(BaseModel):
     crisis_region: str = "SYR"
     resource_type: str  # 'food' | 'medicine' | 'shelter'
     top_n_rationale: int = 10
+    # ai_drafted mode only: how many resource units (trucks/kits/staff)
+    # are assumed available to dispatch. No official capacity figure
+    # exists for these crises (same reason there's no official $ pool),
+    # so this is a scenario assumption the coordinator sets -- not a
+    # claimed real number -- fed into the OR-Tools solver as a hard cap.
+    capacity_units: int = 60
 
 
 @app.post("/allocate")
@@ -449,6 +525,16 @@ def allocate(req: AllocationRequest):
     else:
         supply_pool = None
         districts = rank_by_need(districts)
+        # Real constrained optimization (OR-Tools CP-SAT), not a sorted
+        # list -- splits the assumed capacity across districts weighted
+        # by need, boosted by real road-network chokepoint status and
+        # capped by real live flood-extent access limits. See optimizer.py.
+        dispatch = optimize_dispatch(districts, req.capacity_units)
+        for d in districts:
+            info = dispatch.get(d["admin_code"], {})
+            d["units_allocated"] = info.get("units_allocated")
+            d["network_multiplier"] = info.get("network_multiplier")
+            d["access_factor"] = info.get("access_factor")
         top = districts[: req.top_n_rationale]
 
     rationale_by_code = generate_rationale(get_gemini_client(), top, req.resource_type, crisis["name"], crisis["mode"])
@@ -481,6 +567,9 @@ def allocate(req: AllocationRequest):
             "need_score": d["need_score"],
             "quantity_allocated": d["quantity_allocated"],
             "priority_rank": d.get("priority_rank"),
+            "units_allocated": d.get("units_allocated"),
+            "network_multiplier": d.get("network_multiplier"),
+            "access_factor": d.get("access_factor"),
             "lat": d["lat"],
             "lon": d["lon"],
             "context": d["context"],
@@ -499,6 +588,7 @@ def allocate(req: AllocationRequest):
         "mode": crisis["mode"],
         "resource_type": req.resource_type,
         "supply_pool_usd": supply_pool,
+        "capacity_units": req.capacity_units if crisis["mode"] != "hrp_grounded" else None,
         "district_count": len(results),
         "allocations": results,
     }

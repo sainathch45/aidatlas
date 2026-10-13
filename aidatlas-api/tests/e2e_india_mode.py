@@ -31,8 +31,11 @@ def run(url: str, out_dir: str):
             page.wait_for_timeout(1500)
 
             pool_text = page.text_content("#stat-pool")
-            assert "N/A" in pool_text, f"{code}: pool should say N/A, got {pool_text!r}"
-            print(f"  OK pool stat: {pool_text!r}")
+            assert "N/A" in pool_text, f"{code}: pool should say N/A before a run, got {pool_text!r}"
+            print(f"  OK pool stat (pre-run): {pool_text!r}")
+
+            capacity_visible = not page.is_hidden("#capacity-control")
+            assert capacity_visible, f"{code}: capacity control should be visible for ai_drafted crises"
 
             btn_text = page.text_content("#run-btn")
             assert "DRAFT" in btn_text, f"{code}: button should say DRAFT, got {btn_text!r}"
@@ -52,11 +55,20 @@ def run(url: str, out_dir: str):
             assert "AI-DRAFTED" in stat_status and "NOT OFFICIAL" in stat_status, f"{code}: {stat_status!r}"
             print(f"  OK stat-status: {stat_status!r}")
 
+            pool_text_after = page.text_content("#stat-pool")
+            assert "units" in pool_text_after and "not official" in pool_text_after, f"{code}: {pool_text_after!r}"
+            print(f"  OK pool stat (post-run, assumed capacity): {pool_text_after!r}")
+
             detail_amount_label = page.text_content("#detail-amount-label")
             detail_amount = page.text_content("#detail-amount")
-            assert detail_amount_label == "Priority", f"{code}: expected Priority label, got {detail_amount_label!r}"
-            assert detail_amount.startswith("#"), f"{code}: expected #N rank, got {detail_amount!r}"
-            print(f"  OK detail shows priority rank: {detail_amount!r}")
+            assert detail_amount_label == "Dispatched", f"{code}: expected Dispatched label, got {detail_amount_label!r}"
+            assert "units" in detail_amount, f"{code}: expected N units, got {detail_amount!r}"
+            print(f"  OK detail shows solver-dispatched units: {detail_amount!r}")
+
+            dispatch_visible = not page.is_hidden("#detail-dispatch")
+            assert dispatch_visible, f"{code}: OR-Tools dispatch panel should be visible"
+            dispatch_text = page.text_content("#detail-dispatch")
+            print(f"  OK dispatch panel: {dispatch_text[:100]!r}")
 
             sources_visible = not page.is_hidden("#detail-sources")
             assert sources_visible, f"{code}: source citations should be visible"

@@ -106,6 +106,15 @@ body{
 }
 .resource-btn.active{border-color:var(--accent); color:var(--accent); background:var(--accent-dim);}
 
+.capacity-control{margin-bottom:10px;}
+.capacity-label{display:block; font-size:10px; color:var(--ink-dim); margin-bottom:5px; line-height:1.4;}
+.capacity-input{
+  width:100%; background:var(--bg); border:1px solid var(--border); color:var(--ink);
+  padding:8px 10px; border-radius:5px; font-family:var(--mono); font-size:13px; font-weight:600;
+}
+.capacity-input:focus{outline:1px solid var(--accent);}
+.capacity-hint{font-size:10px; color:var(--ink-dim); margin:5px 0 0; line-height:1.4;}
+
 #run-btn{
   width:100%; background:var(--accent); color:#031018; border:none; border-radius:5px;
   padding:11px; font-family:var(--display); font-weight:800; letter-spacing:.08em; font-size:12px;
@@ -127,6 +136,36 @@ body{
 }
 .detail-sources{font-size:10px; color:var(--ink-dim); margin:8px 0 0; line-height:1.5; word-break:break-all;}
 .detail-sources a{color:var(--ink-dim);}
+
+.detail-satellite{
+  font-size:10.5px; color:var(--ink); line-height:1.6; background:var(--accent-dim);
+  border-left:3px solid var(--good); padding:7px 10px; border-radius:0 4px 4px 0; margin:8px 0 0;
+}
+.detail-satellite .sat-tag{
+  display:inline-block; font-family:var(--display); font-size:8.5px; letter-spacing:.08em;
+  color:var(--good); text-transform:uppercase; margin-right:6px;
+}
+.detail-satellite .sat-val{font-variant-numeric:tabular-nums; color:var(--ink);}
+
+.detail-dispatch{
+  font-size:10.5px; color:var(--ink); line-height:1.6; background:rgba(58,214,255,.06);
+  border-left:3px solid var(--accent); padding:7px 10px; border-radius:0 4px 4px 0; margin:0 0 0;
+}
+.detail-dispatch .dispatch-tag{
+  display:inline-block; font-family:var(--display); font-size:8.5px; letter-spacing:.08em;
+  color:var(--accent); text-transform:uppercase; margin-right:6px;
+}
+.detail-dispatch .dispatch-val{font-variant-numeric:tabular-nums; color:var(--ink); font-weight:600;}
+
+.detail-flood{
+  font-size:10.5px; color:var(--ink); line-height:1.6; background:rgba(255,93,93,.08);
+  border-left:3px solid var(--danger); padding:7px 10px; border-radius:0 4px 4px 0; margin:8px 0 0;
+}
+.detail-flood .flood-tag{
+  display:inline-block; font-family:var(--display); font-size:8.5px; letter-spacing:.08em;
+  color:var(--danger); text-transform:uppercase; margin-right:6px;
+}
+.detail-flood .flood-val{font-variant-numeric:tabular-nums; color:var(--ink); font-weight:600;}
 
 #ask-log{max-height:220px; overflow-y:auto; display:flex; flex-direction:column; gap:10px; margin-bottom:10px;}
 .ask-q{font-size:12px; color:var(--accent); font-weight:600;}

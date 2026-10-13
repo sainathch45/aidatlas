@@ -62,6 +62,11 @@
           <button class="resource-btn" data-type="food">Food</button>
           <button class="resource-btn" data-type="medicine">Medicine</button>
         </div>
+        <div id="capacity-control" class="capacity-control" hidden>
+          <label for="capacity-input" class="capacity-label">Assumed capacity (units available to dispatch)</label>
+          <input type="number" id="capacity-input" class="capacity-input" value="60" min="1" max="500" step="1">
+          <p class="capacity-hint">No official capacity figure exists for this crisis — set the scenario yourself. A real OR-Tools optimizer splits it across districts, factoring in live flood access and real road-network chokepoints.</p>
+        </div>
         <button id="run-btn">RUN ALLOCATION</button>
         <p id="run-status" class="run-status"></p>
       </div>
@@ -78,6 +83,9 @@
             <div><span class="dg-label" id="detail-amount-label">Allocated</span><span class="dg-val accent" id="detail-amount">—</span></div>
           </div>
           <p class="detail-rationale" id="detail-rationale"></p>
+          <p class="detail-dispatch" id="detail-dispatch" hidden></p>
+          <p class="detail-satellite" id="detail-satellite" hidden></p>
+          <p class="detail-flood" id="detail-flood" hidden></p>
           <p class="detail-sources" id="detail-sources" hidden></p>
         </div>
       </div>

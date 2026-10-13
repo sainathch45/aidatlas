@@ -1,6 +1,7 @@
 {
   "_note": "Hand-compiled from public news reporting (not an official structured government dataset like HDX HAPI) -- compiled 2026-10-10. Every figure here traces to a named source. District HQ coordinates are standard public geography, not a crisis claim. No official funding-appeal figure exists for either state (unlike Syria/Myanmar's formal HRPs), so this briefing drives a priority-ranking draft, not a dollar allocation.",
-
+  "_satellite_note": "The 'satellite' field per district is computed LIVE from Google Earth Engine (CHIRPS precipitation, MODIS NDVI) by data/fetch_satellite_indicators.py -- not cited from an article, computed directly from the raw satellite record at that district's point coordinates. Confirmed real data-latency before choosing windows: CHIRPS lagged ~40 days and MODIS NDVI ~26 days behind 'today' (2026-10-10) at computation time, so windows are chosen to sit inside confirmed-available data, not assumed current. Single-point sampling (one lat/lon per district, not a district-wide average) is a real limitation, especially for NDVI, which can be sensitive to the specific land cover at that exact point -- kept as-is rather than smoothed, including results that don't fit a tidy narrative (see Assam below).",
+  "_flood_extent_note": "The 'flood_extent' field (Assam districts only) is computed LIVE from Sentinel-1 SAR by data/fetch_flood_extent.py -- a standard VV-backscatter change-detection threshold (water reflects radar away from the sensor, so backscatter drops sharply when land floods), not ML. It measures flood-water fraction within a 7km radius of the district HQ point, a different and narrower spatial scope than the district-wide submerged-area figures in news coverage -- both real, not expected to match exactly. Compared against a pre-monsoon baseline (May-early Jun 2026) using the closest real Sentinel-1 pass after the 19 Jul cloudburst (29 Jul, 10 days post-event, since the satellite's 12-day revisit meant nothing closer existed) -- confirmed the flood fraction genuinely jumps across the event (Golaghat 2.3% on the pre-event pass -> 7.2% after; Sivasagar 11.1% -> 30.3%) rather than assuming it.",
   "MHD": {
     "name": "Maharashtra (2026 El Nino Drought)",
     "crisis_summary": "Maharashtra declared drought in 265 of 358 talukas (74% of the state, 32 districts) after an 18-19% statewide monsoon rainfall deficit, with Marathwada region specifically ~40% below normal. ~7.29 million agricultural households potentially affected statewide. El Nino-driven; India cut its 2026-27 foodgrain production target as a result.",
@@ -12,15 +13,132 @@
       "https://www.downtoearth.org.in/natural-disasters/maharashtra-declares-drought-in-265-talukas-as-crop-losses-mount-after-weak-monsoon"
     ],
     "districts": [
-      {"name": "Solapur", "value": 58, "note": "Worst-hit district by rainfall deficit", "lat": 17.6599, "lon": 75.9064},
-      {"name": "Beed", "value": 51, "lat": 18.9894, "lon": 75.7601},
-      {"name": "Hingoli", "value": 49, "lat": 19.7172, "lon": 77.1492},
-      {"name": "Jalna", "value": 46, "lat": 19.8347, "lon": 75.8816},
-      {"name": "Dharashiv", "value": 45, "lat": 18.1860, "lon": 76.0419},
-      {"name": "Latur", "value": 39, "note": "Figure is % of annual average rainfall received, i.e. ~61% deficit -- kept as the lower-confidence raw figure actually reported rather than converted, since the source gave it this way", "lat": 18.4088, "lon": 76.5604}
+      {
+        "name": "Solapur",
+        "value": 58,
+        "note": "Worst-hit district by rainfall deficit",
+        "lat": 17.6599,
+        "lon": 75.9064,
+        "satellite": {
+          "rainfall_deficit_pct_live": 32.6,
+          "rainfall_current_mm": 322.0,
+          "rainfall_historical_mean_mm": 477.9,
+          "ndvi_anomaly": 0.064,
+          "window": "Jun-Aug 2026 vs 2016-2025 mean"
+        },
+        "chokepoint": {
+          "hub": "Chhatrapati Sambhajinagar",
+          "route_from_hub_km": 309.1,
+          "route_from_hub_min": 313.0,
+          "chokepoint_for": []
+        }
+      },
+      {
+        "name": "Beed",
+        "value": 51,
+        "lat": 18.9894,
+        "lon": 75.7601,
+        "satellite": {
+          "rainfall_deficit_pct_live": 34.8,
+          "rainfall_current_mm": 308.4,
+          "rainfall_historical_mean_mm": 473.1,
+          "ndvi_anomaly": -0.054,
+          "window": "Jun-Aug 2026 vs 2016-2025 mean"
+        },
+        "chokepoint": {
+          "hub": "Chhatrapati Sambhajinagar",
+          "route_from_hub_km": 125.9,
+          "route_from_hub_min": 138.6,
+          "chokepoint_for": [
+            "Solapur",
+            "Dharashiv",
+            "Latur"
+          ]
+        }
+      },
+      {
+        "name": "Hingoli",
+        "value": 49,
+        "lat": 19.7172,
+        "lon": 77.1492,
+        "satellite": {
+          "rainfall_deficit_pct_live": 38.5,
+          "rainfall_current_mm": 476.2,
+          "rainfall_historical_mean_mm": 773.7,
+          "ndvi_anomaly": 0.003,
+          "window": "Jun-Aug 2026 vs 2016-2025 mean"
+        },
+        "chokepoint": {
+          "hub": "Chhatrapati Sambhajinagar",
+          "route_from_hub_km": 264.0,
+          "route_from_hub_min": 238.2,
+          "chokepoint_for": []
+        }
+      },
+      {
+        "name": "Jalna",
+        "value": 46,
+        "lat": 19.8347,
+        "lon": 75.8816,
+        "satellite": {
+          "rainfall_deficit_pct_live": 43.5,
+          "rainfall_current_mm": 306.6,
+          "rainfall_historical_mean_mm": 542.2,
+          "ndvi_anomaly": -0.018,
+          "window": "Jun-Aug 2026 vs 2016-2025 mean"
+        },
+        "chokepoint": {
+          "hub": "Chhatrapati Sambhajinagar",
+          "route_from_hub_km": 59.5,
+          "route_from_hub_min": 79.2,
+          "chokepoint_for": [
+            "Hingoli"
+          ]
+        }
+      },
+      {
+        "name": "Dharashiv",
+        "value": 45,
+        "lat": 18.186,
+        "lon": 76.0419,
+        "satellite": {
+          "rainfall_deficit_pct_live": 34.3,
+          "rainfall_current_mm": 309.0,
+          "rainfall_historical_mean_mm": 470.0,
+          "ndvi_anomaly": -0.005,
+          "window": "Jun-Aug 2026 vs 2016-2025 mean"
+        },
+        "chokepoint": {
+          "hub": "Chhatrapati Sambhajinagar",
+          "route_from_hub_km": 242.6,
+          "route_from_hub_min": 245.5,
+          "chokepoint_for": [
+            "Solapur"
+          ]
+        }
+      },
+      {
+        "name": "Latur",
+        "value": 39,
+        "note": "Figure is % of annual average rainfall received, i.e. ~61% deficit -- kept as the lower-confidence raw figure actually reported rather than converted, since the source gave it this way",
+        "lat": 18.4088,
+        "lon": 76.5604,
+        "satellite": {
+          "rainfall_deficit_pct_live": 32.6,
+          "rainfall_current_mm": 381.4,
+          "rainfall_historical_mean_mm": 565.5,
+          "ndvi_anomaly": -0.025,
+          "window": "Jun-Aug 2026 vs 2016-2025 mean"
+        },
+        "chokepoint": {
+          "hub": "Chhatrapati Sambhajinagar",
+          "route_from_hub_km": 263.2,
+          "route_from_hub_min": 287.2,
+          "chokepoint_for": []
+        }
+      }
     ]
   },
-
   "ASF": {
     "name": "Assam (2026 Floods)",
     "crisis_summary": "Two separate 2026 flood events: a July 19 cloudburst-triggered flood in Upper Assam (Sivasagar, Charaideo, Jorhat, Golaghat), and widespread late-June monsoon flooding (Dhemaji, Dibrugarh, Lakhimpur, Chirang, Nalbari). Over 700,000 people displaced statewide, 100+ deaths, ~119,000 hectares of cropland submerged. Charaideo and Jorhat are also real, named affected districts from the same event, but no source found gave them a separately quantified figure (only that Sivasagar alone exceeded both combined) -- left out of the ranked list below rather than estimated, per this project's no-fabrication rule.",
@@ -32,8 +150,63 @@
       "https://en.wikipedia.org/wiki/2026_Assam_floods"
     ],
     "districts": [
-      {"name": "Golaghat", "value": 145, "note": "Most affected villages of any district", "lat": 26.5106, "lon": 93.9647},
-      {"name": "Sivasagar", "value": 110, "note": "Also hardest hit by population affected (348,000 at peak), the single largest population figure found for any district in this event", "lat": 26.9850, "lon": 94.6378}
+      {
+        "name": "Golaghat",
+        "value": 145,
+        "note": "Most affected villages of any district",
+        "lat": 26.5106,
+        "lon": 93.9647,
+        "satellite": {
+          "rainfall_pct_of_normal_live": 108.7,
+          "rainfall_current_mm": 229.0,
+          "rainfall_historical_mean_mm": 210.7,
+          "window": "10-25 Jul 2026 (flood-trigger window) vs 2016-2025 mean",
+          "note": "Local rainfall was only slightly above normal, not an extreme spike -- consistent with the flood being driven by the cloudburst and river surge originating in neighboring Nagaland's hills, not excess local rainfall. Reported as found, not adjusted to fit a simpler story."
+        },
+        "flood_extent": {
+          "flooded_area_pct_live": 7.2,
+          "radius_km": 7,
+          "pre_window": "2026-05-01 to 2026-06-10 (pre-monsoon baseline median)",
+          "post_window": "2026-07-28 to 2026-07-30 (closest Sentinel-1 pass after the 19 Jul cloudburst, 10 days post-event)",
+          "method": "Sentinel-1 VV backscatter change detection: pixel = flood water if backscatter dropped >3dB from baseline AND post-event VV < -16dB",
+          "note": "Measures flood-water extent within a 7km radius of the district HQ coordinate specifically, not the district-wide submerged area reported in news coverage (~119,000 ha statewide) -- different spatial scope, both real. Standing water may have partly receded by this pass (10 days post-event), so this likely understates peak extent rather than overstates it."
+        },
+        "chokepoint": {
+          "hub": "Jorhat",
+          "route_from_hub_km": 40.2,
+          "route_from_hub_min": 59.3,
+          "chokepoint_for": []
+        }
+      },
+      {
+        "name": "Sivasagar",
+        "value": 110,
+        "note": "Also hardest hit by population affected (348,000 at peak), the single largest population figure found for any district in this event",
+        "lat": 26.985,
+        "lon": 94.6378,
+        "satellite": {
+          "rainfall_pct_of_normal_live": 106.2,
+          "rainfall_current_mm": 215.5,
+          "rainfall_historical_mean_mm": 202.8,
+          "window": "10-25 Jul 2026 (flood-trigger window) vs 2016-2025 mean",
+          "note": "Same pattern as Golaghat -- local rainfall near normal, flood driven by upstream catchment effects."
+        },
+        "flood_extent": {
+          "flooded_area_pct_live": 30.3,
+          "radius_km": 7,
+          "pre_window": "2026-05-01 to 2026-06-10 (pre-monsoon baseline median)",
+          "post_window": "2026-07-28 to 2026-07-30 (closest Sentinel-1 pass after the 19 Jul cloudburst, 10 days post-event)",
+          "method": "Sentinel-1 VV backscatter change detection: pixel = flood water if backscatter dropped >3dB from baseline AND post-event VV < -16dB",
+          "note": "Measures flood-water extent within a 7km radius of the district HQ coordinate specifically, not the district-wide submerged area reported in news coverage (~119,000 ha statewide) -- different spatial scope, both real. Standing water may have partly receded by this pass (10 days post-event), so this likely understates peak extent rather than overstates it."
+        },
+        "chokepoint": {
+          "hub": "Jorhat",
+          "route_from_hub_km": 57.5,
+          "route_from_hub_min": 86.4,
+          "chokepoint_for": []
+        }
+      }
     ]
-  }
+  },
+  "_chokepoint_note": "The chokepoint field per district is computed LIVE from Google Routes API by data/fetch_road_chokepoints.py -- real driving routes (not straight lines) from a real regional logistics hub (Chhatrapati Sambhajinagar for Maharashtra, Jorhat for Assam -- the actual nearer regional centers, not the far state capitals) to each district. chokepoint_for lists OTHER affected districts whose real hub route passes within 15km of this district -- i.e. this district sits on the real road corridor serving them, so prioritizing delivery here has a network effect beyond its own population. OSM public Overpass API was tried first and proved unreliable from this build environment (repeated real connection timeouts, confirmed live) -- switched to Google Routes API instead, equally real road data, Google-native."
 }

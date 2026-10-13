@@ -143,6 +143,7 @@ async function switchCrisis(code) {
     document.getElementById("stat-funded").textContent = isDrafted ? "No formal appeal" : `${meta.funding_pct}% funded`;
     document.getElementById("run-btn").textContent = isDrafted ? "DRAFT PRIORITY PLAN" : "RUN ALLOCATION";
     document.getElementById("detail-sources").hidden = true;
+    document.getElementById("capacity-control").hidden = !isDrafted;
   }
   await loadDistricts();
 }
@@ -169,6 +170,64 @@ async function loadDistricts() {
   } catch (err) {
     setRunStatus("Could not load district data: " + err.message, true);
   }
+}
+
+function formatSatellite(sat) {
+  // Live-computed from Earth Engine (CHIRPS/MODIS), separate from the
+  // cited news figure shown above -- different window/methodology, so
+  // render it as its own line rather than folding it into the metric,
+  // and show the note verbatim when the two diverge (e.g. Assam).
+  if (!sat) return null;
+  const parts = [];
+  if (sat.rainfall_deficit_pct_live != null) {
+    parts.push(`<span class="sat-val">${sat.rainfall_deficit_pct_live}%</span> rainfall deficit`);
+  } else if (sat.rainfall_pct_of_normal_live != null) {
+    parts.push(`<span class="sat-val">${sat.rainfall_pct_of_normal_live}%</span> of normal rainfall`);
+  }
+  if (sat.rainfall_current_mm != null && sat.rainfall_historical_mean_mm != null) {
+    parts.push(`<span class="sat-val">${sat.rainfall_current_mm}mm</span> vs <span class="sat-val">${sat.rainfall_historical_mean_mm}mm</span> normal`);
+  }
+  if (sat.ndvi_anomaly != null) {
+    const sign = sat.ndvi_anomaly > 0 ? "+" : "";
+    parts.push(`NDVI anomaly <span class="sat-val">${sign}${sat.ndvi_anomaly}</span>`);
+  }
+  if (!parts.length) return null;
+  let html = `<span class="sat-tag">Live satellite</span>${parts.join(" · ")}`;
+  if (sat.window) html += ` <span class="sat-val">(${sat.window})</span>`;
+  if (sat.note) html += `<br>${sat.note}`;
+  return html;
+}
+
+function formatFloodExtent(flood) {
+  // Path B: Sentinel-1 SAR change detection, a methodologically distinct
+  // live signal from the CHIRPS/MODIS one above -- direct radar
+  // measurement of water on the ground, not rainfall or vegetation proxy.
+  if (!flood) return null;
+  let html = `<span class="flood-tag">Live radar (SAR)</span>` +
+    `<span class="flood-val">${flood.flooded_area_pct_live}%</span> of area flooded ` +
+    `within ${flood.radius_km}km of HQ <span class="flood-val">(${flood.post_window})</span>`;
+  if (flood.note) html += `<br>${flood.note}`;
+  return html;
+}
+
+function formatDispatch(d) {
+  // Real OR-Tools solved dispatch, not a sorted list -- shows the two
+  // real factors (live road-network chokepoint status, live flood
+  // access limits) that moved this district's units above/below a
+  // plain need-score split, so the number isn't just a black box.
+  if (d.units_allocated == null) return null;
+  const parts = [`<span class="dispatch-val">${d.units_allocated}</span> units (need rank #${d.priority_rank ?? "?"})`];
+  const nm = d.network_multiplier;
+  if (nm != null && nm > 1) {
+    const choke = (d.context || {}).chokepoint;
+    const servesText = choke?.chokepoint_for?.length ? `, serves route to ${choke.chokepoint_for.join(", ")}` : "";
+    parts.push(`<span class="dispatch-val">${nm}x</span> network priority (real road chokepoint${servesText})`);
+  }
+  const af = d.access_factor;
+  if (af != null && af < 1) {
+    parts.push(`capped to <span class="dispatch-val">${Math.round(af * 100)}%</span> capacity (live flood access limit)`);
+  }
+  return `<span class="dispatch-tag">OR-Tools dispatch</span>${parts.join(" · ")}`;
 }
 
 function showDistrict(code) {
@@ -210,15 +269,45 @@ function showDistrict(code) {
       sourcesEl.hidden = true;
     }
   }
+
+  const satEl = document.getElementById("detail-satellite");
+  const satHtml = formatSatellite(ctx.satellite);
+  if (satHtml) {
+    satEl.innerHTML = satHtml;
+    satEl.hidden = false;
+  } else {
+    satEl.hidden = true;
+  }
+
+  const floodEl = document.getElementById("detail-flood");
+  const floodHtml = formatFloodExtent(ctx.flood_extent);
+  if (floodHtml) {
+    floodEl.innerHTML = floodHtml;
+    floodEl.hidden = false;
+  } else {
+    floodEl.hidden = true;
+  }
   document.getElementById("detail-need").textContent = d.need_score ? d.need_score.toFixed(1) : "—";
 
-  if (d.priority_rank != null) {
+  if (d.units_allocated != null) {
+    document.getElementById("detail-amount-label").textContent = "Dispatched";
+    document.getElementById("detail-amount").textContent = `${d.units_allocated} units`;
+  } else if (d.priority_rank != null) {
     document.getElementById("detail-amount-label").textContent = "Priority";
     document.getElementById("detail-amount").textContent = `#${d.priority_rank}`;
   } else {
     document.getElementById("detail-amount-label").textContent = "Allocated";
     document.getElementById("detail-amount").textContent =
       d.quantity_allocated != null ? "$" + d.quantity_allocated.toLocaleString() : "not yet allocated";
+  }
+
+  const dispatchEl = document.getElementById("detail-dispatch");
+  const dispatchHtml = formatDispatch(d);
+  if (dispatchHtml) {
+    dispatchEl.innerHTML = dispatchHtml;
+    dispatchEl.hidden = false;
+  } else {
+    dispatchEl.hidden = true;
   }
 
   const figureNoun = d.priority_rank != null ? "ranking" : "allocation amount";
@@ -245,21 +334,21 @@ function highlightSelected(code) {
   // whole set -- cheap, and keeps everyone else's severity color intact.
   if (selectedCode && markers[selectedCode]) {
     const prev = districtData[selectedCode];
-    const prevSev = severityBucket(prev.quantity_allocated ?? prev.need_score, currentMaxValue());
+    const prevSev = severityBucket(prev.quantity_allocated ?? prev.units_allocated ?? prev.need_score, currentMaxValue());
     markers[selectedCode].setIcon(markerIcon(prevSev, false));
   }
   selectedCode = code;
   const marker = markers[code];
   if (marker) {
     const d = districtData[code];
-    const sev = severityBucket(d.quantity_allocated ?? d.need_score, currentMaxValue());
+    const sev = severityBucket(d.quantity_allocated ?? d.units_allocated ?? d.need_score, currentMaxValue());
     marker.setIcon(markerIcon(sev, true));
     marker.setZIndex(999);
   }
 }
 
 function currentMaxValue() {
-  const values = Object.values(districtData).map((d) => d.quantity_allocated ?? d.need_score ?? 0);
+  const values = Object.values(districtData).map((d) => d.quantity_allocated ?? d.units_allocated ?? d.need_score ?? 0);
   return values.length ? Math.max(...values) : 0;
 }
 
@@ -267,7 +356,7 @@ function repaintMarkers(maxAmount) {
   Object.entries(districtData).forEach(([code, d]) => {
     const marker = markers[code];
     if (!marker) return;
-    const sev = severityBucket(d.quantity_allocated ?? 0, maxAmount);
+    const sev = severityBucket(d.quantity_allocated ?? d.units_allocated ?? 0, maxAmount);
     marker.setIcon(markerIcon(sev, code === selectedCode));
     if (code === selectedCode) marker.setZIndex(999);
   });
@@ -318,6 +407,7 @@ async function runAllocation() {
         crisis_region: currentCrisisRegion,
         resource_type: currentResourceType,
         top_n_rationale: 10,
+        capacity_units: parseInt(document.getElementById("capacity-input").value, 10) || 60,
       }),
     });
 
@@ -327,12 +417,12 @@ async function runAllocation() {
 
     const isDrafted = data.mode === "ai_drafted";
     const maxValue = isDrafted
-      ? Math.max(...data.allocations.map((d) => d.need_score))
+      ? Math.max(...data.allocations.map((d) => d.units_allocated ?? d.need_score))
       : Math.max(...data.allocations.map((d) => d.quantity_allocated));
     repaintMarkers(maxValue);
 
     document.getElementById("stat-pool").textContent = isDrafted
-      ? "N/A — no official appeal"
+      ? `${data.capacity_units} units (assumed, not official)`
       : "$" + data.supply_pool_usd.toLocaleString();
 
     const statusEl = document.getElementById("stat-status");
@@ -344,7 +434,7 @@ async function runAllocation() {
     allocationRun = true;
 
     const top = isDrafted
-      ? [...data.allocations].sort((a, b) => a.priority_rank - b.priority_rank)[0]
+      ? [...data.allocations].sort((a, b) => (b.units_allocated ?? 0) - (a.units_allocated ?? 0))[0]
       : [...data.allocations].sort((a, b) => b.quantity_allocated - a.quantity_allocated)[0];
     showDistrict(top.admin_code);
 

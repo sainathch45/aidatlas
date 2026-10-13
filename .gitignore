@@ -3,6 +3,7 @@ __pycache__/
 *.pyc
 .env
 data/raw/
+data/cache/
 node_modules/
 *.log
 .firebase/
