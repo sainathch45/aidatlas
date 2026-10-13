@@ -1,0 +1,128 @@
+[
+  {
+    "id": "listing_1",
+    "farmer_id": "farmer_1",
+    "quantity_kg": 1500,
+    "crop_type": "rice_stubble",
+    "quality_grade": "unknown"
+  },
+  {
+    "id": "listing_2",
+    "farmer_id": "farmer_2",
+    "quantity_kg": 1500,
+    "crop_type": "wheat_stubble",
+    "quality_grade": "unknown"
+  },
+  {
+    "id": "listing_3",
+    "farmer_id": "farmer_3",
+    "quantity_kg": 600,
+    "crop_type": "rice_stubble",
+    "quality_grade": "unknown"
+  },
+  {
+    "id": "listing_4",
+    "farmer_id": "farmer_4",
+    "quantity_kg": 1500,
+    "crop_type": "rice_stubble",
+    "quality_grade": "mixed"
+  },
+  {
+    "id": "listing_5",
+    "farmer_id": "farmer_5",
+    "quantity_kg": 1000,
+    "crop_type": "rice_stubble",
+    "quality_grade": "unknown"
+  },
+  {
+    "id": "listing_6",
+    "farmer_id": "farmer_6",
+    "quantity_kg": 400,
+    "crop_type": "rice_stubble",
+    "quality_grade": "unknown"
+  },
+  {
+    "id": "listing_7",
+    "farmer_id": "farmer_7",
+    "quantity_kg": 1200,
+    "crop_type": "rice_stubble",
+    "quality_grade": "mixed"
+  },
+  {
+    "id": "listing_8",
+    "farmer_id": "farmer_8",
+    "quantity_kg": 600,
+    "crop_type": "wheat_stubble",
+    "quality_grade": "unknown"
+  },
+  {
+    "id": "listing_9",
+    "farmer_id": "farmer_9",
+    "quantity_kg": 1000,
+    "crop_type": "wheat_stubble",
+    "quality_grade": "unknown"
+  },
+  {
+    "id": "listing_10",
+    "farmer_id": "farmer_10",
+    "quantity_kg": 600,
+    "crop_type": "wheat_stubble",
+    "quality_grade": "dry"
+  },
+  {
+    "id": "listing_11",
+    "farmer_id": "farmer_11",
+    "quantity_kg": 800,
+    "crop_type": "rice_stubble",
+    "quality_grade": "unknown"
+  },
+  {
+    "id": "listing_12",
+    "farmer_id": "farmer_12",
+    "quantity_kg": 800,
+    "crop_type": "rice_stubble",
+    "quality_grade": "unknown"
+  },
+  {
+    "id": "listing_13",
+    "farmer_id": "farmer_13",
+    "quantity_kg": 1000,
+    "crop_type": "rice_stubble",
+    "quality_grade": "dry"
+  },
+  {
+    "id": "listing_14",
+    "farmer_id": "farmer_14",
+    "quantity_kg": 800,
+    "crop_type": "wheat_stubble",
+    "quality_grade": "unknown"
+  },
+  {
+    "id": "listing_15",
+    "farmer_id": "farmer_15",
+    "quantity_kg": 1500,
+    "crop_type": "wheat_stubble",
+    "quality_grade": "mixed"
+  },
+  {
+    "id": "listing_16",
+    "farmer_id": "farmer_16",
+    "quantity_kg": 400,
+    "crop_type": "wheat_stubble",
+    "quality_grade": "unknown"
+  },
+  {
+    "id": "listing_17",
+    "farmer_id": "farmer_17",
+    "quantity_kg": 1200,
+    "crop_type": "wheat_stubble",
+    "quality_grade": "mixed"
+  },
+  {
+    "id": "listing_18",
+    "farmer_id": "farmer_18",
+    "quantity_kg": 800,
+    "crop_type": "rice_stubble",
+    "quality_grade": "unknown"
+  }
+]

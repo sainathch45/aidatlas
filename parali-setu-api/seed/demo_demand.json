@@ -1,0 +1,63 @@
+[
+  {
+    "id": "demand_1",
+    "company_id": "co_1",
+    "crop_type": "rice_stubble",
+    "quantity_needed_kg": 3000,
+    "price_offer_per_kg": 8.98,
+    "accepted_quality_grades": [
+      "unknown",
+      "dry"
+    ]
+  },
+  {
+    "id": "demand_2",
+    "company_id": "co_2",
+    "crop_type": "rice_stubble",
+    "quantity_needed_kg": 4000,
+    "price_offer_per_kg": 7.78,
+    "accepted_quality_grades": [
+      "unknown",
+      "dry",
+      "wet",
+      "mixed"
+    ]
+  },
+  {
+    "id": "demand_3",
+    "company_id": "co_3",
+    "crop_type": "rice_stubble",
+    "quantity_needed_kg": 3000,
+    "price_offer_per_kg": 8.68,
+    "accepted_quality_grades": [
+      "unknown",
+      "dry",
+      "wet",
+      "mixed"
+    ]
+  },
+  {
+    "id": "demand_4",
+    "company_id": "co_4",
+    "crop_type": "rice_stubble",
+    "quantity_needed_kg": 3000,
+    "price_offer_per_kg": 7.69,
+    "accepted_quality_grades": [
+      "unknown",
+      "dry",
+      "wet",
+      "mixed"
+    ]
+  },
+  {
+    "id": "demand_5",
+    "company_id": "co_5",
+    "crop_type": "rice_stubble",
+    "quantity_needed_kg": 3000,
+    "price_offer_per_kg": 8.62,
+    "accepted_quality_grades": [
+      "unknown",
+      "dry"
+    ]
+  }
+]
