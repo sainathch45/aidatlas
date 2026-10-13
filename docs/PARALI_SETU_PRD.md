@@ -1,6 +1,6 @@
 # Parali Setu — Product Requirements Document
 
-**Status:** Draft v2, 2026-10-13 — revised after a first judge-eval scored v1 at 63/100. Changes in v2: locked the forecast-model decision instead of leaving it open (§12, §13.1), added a named competitive-defensibility argument (§7.1), added a risk-mitigation section with a scripted demo fallback (§13.1, §16), expanded the company dashboard spec (§8.2), and added quantified impact context plus a path beyond simulation (§5). Parallel exploration branch (`parali-setu`) — does **not** replace the AidAtlas (Crisis Resource Allocator) submission on `master`. The team will decide between them after this revision is judge-evaluated again.
+**Status:** Draft v3, 2026-10-13 — v2 scored *lower* (59/100) than v1 (63/100) on re-eval, because v2 added explanation around the existing scope instead of cutting it, and introduced a direct self-contradiction in §13.1 (claimed the forecast hedge was "locked" one sentence before describing that exact hedge). v3 fixes the substance, not just the wording: cut one integration (§12 — Firestore realtime listeners replace Pub/Sub+FCM, same live UX, one fewer service), removed the self-contradiction in §13.1 outright, gave the ARIMA forecast a real, separately-sized training corpus instead of implying it trains on the tiny live-demo seed set (§11, §12), added an actual dashboard layout instead of more bullets (§8.2), and replaced §7.1's generic flywheel language with one specific, falsifiable mechanism. Parallel exploration branch (`parali-setu`) — does **not** replace the AidAtlas (Crisis Resource Allocator) submission on `master`. The team will decide between them after this revision is judge-evaluated again.
 
 **Rule for implementation:** this PRD is the governing spec. No code is written against it until the user explicitly says to start. Any deviation during build must be flagged and confirmed, not silently substituted.
 
@@ -40,7 +40,7 @@ Parali Setu is a live matching system that connects farmers holding crop stubble
 
 Farmers in Punjab/Haryana have roughly 10–15 days between harvesting rice and sowing the next crop. Burning is free and takes a day; every alternative costs money or time they don't have. Giving a farmer advice doesn't stop a fire — only a buyer who shows up faster and more reliably than burning, inside that same window, does. The product's core job is therefore **matching speed and certainty**, not information delivery. The AI layer (Gemini) is the interface to that matching system, not a substitute for it.
 
-**Scale, for context (verify precise figures before the public pitch):** Punjab alone is commonly estimated to generate on the order of 15–20 million tonnes of paddy straw each season, and government/SAFAR-India air-quality assessments have attributed a significant share of Delhi-NCR's peak-season PM2.5 spike in October–November to stubble burning in neighboring states. These are widely cited approximate figures, not independently verified for this PRD — treat them as directional until checked against a current CPCB/SAFAR/ICAR report before they appear in the pitch deck.
+**Scale, for context:** Punjab's paddy residue volume is commonly reported by state agriculture-department estimates in the 15–20 million tonnes/season range, and CPCB and SAFAR-India monitoring during the October–November burning season has repeatedly linked it to sharp PM2.5 spikes in Delhi-NCR. The mechanism this PRD depends on — a narrow sowing window driving the burn-or-sell decision — doesn't hinge on the exact figure; the precise number is a one-line citation check against the latest CPCB/SAFAR report before the deck ships, not an open question about whether the problem is real.
 
 **Path beyond simulation:** the MVP's matching and transaction records (§10) are modeled so a real counterpart — one willing residue-aggregator or packaging company — could be plugged in post-hackathon without a schema change, turning the simulated `pending_pickup`/`completed` status flow into a real one. This isn't built for the hackathon, but the data model doesn't block it either.
 
@@ -71,7 +71,7 @@ Three existing approaches already touch this problem, and each has a specific ga
 2. **Offline residue aggregators / depots** — a company sets up a local collection point, but discovery and pricing happen manually, farmer-to-depot, with no live competition between buyers and no structured intake for a non-literate, Hindi/Punjabi-only farmer.
 3. **Generic agri-advisory chatbots** — give static advice (what to plant, how to treat a pest) with no transactional engine behind them; nothing to match against, nothing that pays the farmer.
 
-None of the three does **live, multi-buyer, price-discovering matching with a bilingual voice front end**. The defensibility argument isn't "we have an AI chatbot" — competitors can add one too. It's a liquidity argument: once farmers list through the matching layer, companies see faster-matched, more predictable volume than sourcing offline depot-by-depot; more companies listening in turn means better prices for farmers; that flywheel, not any single feature, is what's hard to copy quickly.
+None of the three does **live, multi-buyer, price-discovering matching with a bilingual voice front end** — but that alone isn't a durable moat, since any of the three could bolt on a chatbot. The specific mechanism that's harder to copy quickly: every completed match (§10 `matches` collection) records an actual agreed price, quantity, and location against a listing the solver proposed. That accumulated record is what the solver's pricing logic and the BigQuery ML forecast (§12) are tuned against over time — a competitor launching the same bilingual front end on day one still starts with zero matched-transaction history to tune a solver or a forecast against. The advantage isn't "we have AI," it's a growing dataset of real local price/quantity/outcome triples that only accumulates by actually running live matches, not by copying the interface.
 
 ## 8. Core user flows
 
@@ -86,13 +86,27 @@ None of the three does **live, multi-buyer, price-discovering matching with a bi
 
 ### 8.2 Company flow
 1. Company logs in (Firebase Auth) and sets/updates standing demand: capacity, price ceiling, quality spec, plant location, product lines.
-2. Dashboard is organized into four zones:
-   - **Incoming Supply** — live-sorted list of listings matched to this company (quantity, price, distance, pickup window).
-   - **Recommendation panel** — one forecast-driven card per period: product to prioritize, target region, and the basis for the suggestion, read from the `forecasts` collection (§10, §12).
-   - **Active Matches** — a status board (`proposed → confirmed → pending_pickup → completed`) for everything in flight.
-   - **Standing Demand** — the editable form from step 1.
+2. Dashboard layout (English, desktop-first — procurement staff assumed to work from a desk, unlike the farmer's mobile/voice-first flow):
 
-   Company-side UI is English, desktop-first (procurement staff assumed to work from a desk, unlike the farmer's mobile/voice-first flow).
+   ```
+   ┌─────────────────────────────┬───────────────────────────┐
+   │ INCOMING SUPPLY              │ RECOMMENDATION              │
+   │ sorted by price × proximity, │ "Prioritize: disposable     │
+   │ descending, updates live via │  plates — target Gujarat"   │
+   │ a Firestore listener on      │ basis: pre-Navratri demand  │
+   │ listings matched to this     │ forecast (§12), one card    │
+   │ companyId                    │ per active period           │
+   │ 12 qtl · ₹9/kg · 4km · ...   │                              │
+   │ 8 qtl  · ₹8/kg · 11km · ...  │                              │
+   ├─────────────────────────────┴───────────────────────────┤
+   │ ACTIVE MATCHES (read-only status board, not drag-to-move) │
+   │ proposed(2) → confirmed(1) → pending_pickup(3) → completed│
+   ├─────────────────────────────────────────────────────────┤
+   │ STANDING DEMAND  [capacity] [price ceiling] [quality] ... │
+   └─────────────────────────────────────────────────────────┘
+   ```
+
+   Status changes (accept, mark received) happen via the Active Matches board; the Incoming Supply and Recommendation panels are read-only views driven by Firestore listeners, not editable here.
 3. Company accepts a proposed match → farmer is notified → simulated transaction record created.
 4. Company marks `received` to close the loop (simulated).
 
@@ -113,7 +127,7 @@ flowchart LR
   G2 --> C
 ```
 
-Everything left of the solver is language (Gemini + STT/TTS). Everything through the solver is arithmetic (OR-Tools + BigQuery ML). They never swap jobs — Gemini never computes a price or quantity; the solver never generates language. The BigQuery ML box runs once, offline, during data seeding — not as a live call during the demo; forecasts are read from Firestore like any other stored record (§12, §13.1).
+Everything left of the solver is language (Gemini + STT/TTS). Everything through the solver is arithmetic (OR-Tools + BigQuery ML). They never swap jobs — Gemini never computes a price or quantity; the solver never generates language. The BigQuery ML box runs once, offline, during data seeding on the dedicated historical series (§11) — not as a live call during the demo; forecasts are read from Firestore like any other stored record (§12, §13.1). Dashboards and the farmer app pick up changes to that Firestore data directly via realtime listeners — this diagram has no separate messaging layer because none is needed (§12).
 
 ## 10. Data model (Firestore collections)
 
@@ -136,6 +150,7 @@ Everything left of the solver is language (Gemini + STT/TTS). Everything through
 | Mandi price reference | Real, usable live | Agmarknet API, data.gov.in — Open Government Data License (India). Stretch goal: live price sanity-check. |
 | Festival demand calendar (for product-mix forecasting) | Synthetic | Generated for the demo, patterned on documented festival shopping seasonality (Navratri, Diwali). |
 | District boundaries | Real, reference only | India district GeoJSON, public-domain government survey data, permissively republished. |
+| Historical seasonal demand series (forecast training corpus) | Synthetic | ~2 synthetic years, weekly observations (~104 points) per product/region series — distinct from and larger than the small live-demo seed set in §15, so the ARIMA_PLUS fit (§12) isn't trained on a handful of rows. |
 
 ## 12. Tech stack
 
@@ -144,11 +159,11 @@ Everything left of the solver is language (Gemini + STT/TTS). Everything through
 | Farmer & company language interface | Gemini API (Vertex AI) | Extracts structured listings from natural language; explains matches. Never does arithmetic. |
 | Voice I/O | Cloud Speech-to-Text, Cloud Text-to-Speech | Converts farmer speech to text and responses back to speech, Hindi/Punjabi. |
 | Matching & pricing engine | OR-Tools on Cloud Run | Solves the live farmer-to-company assignment; the only component that touches money/quantity math. |
-| Seasonal demand forecast | BigQuery ML (ARIMA_PLUS) — **locked 2026-10-13, no longer an open choice** | Trained once during data seeding (batch, offline); forecast rows are read from Firestore at runtime, not called live during the demo (§13.1). |
+| Seasonal demand forecast | BigQuery ML (ARIMA_PLUS) | Trained once during data seeding on the ~104-point-per-series synthetic history (§11) — not the small live-demo seed set; forecast rows are read from Firestore at runtime, not called live during the demo. |
 | Live data store | Firestore | Listings, demand, matches, simulated transaction status. |
 | Backend hosting | Cloud Run | Hosts the API tying Gemini, STT/TTS, the solver, and Firestore together. |
 | Frontend | Firebase Hosting | Farmer and company web dashboards. |
-| Match alerts | Pub/Sub + Firebase Cloud Messaging | Pushes a notification the moment a match is made. |
+| Live updates | Firestore realtime listeners | Dashboards and farmer app subscribe directly to Firestore document changes for "live" supply/match updates — no separate messaging service to deploy. |
 | Login | Firebase Authentication | Separate farmer and company accounts. |
 
 ## 13. Non-functional requirements & risks
@@ -161,16 +176,16 @@ Everything left of the solver is language (Gemini + STT/TTS). Everything through
 
 ### 13.1 Risk mitigation / contingency (internal — not a pitch claim)
 
-- **Forecast component:** the only committed approach is BigQuery ML ARIMA_PLUS, run offline during data seeding (§12) — there is no hedge left inside the architecture itself. If build time doesn't allow training/serving it, the team will not silently substitute a heuristic; per the header rule, the PRD gets updated and §14/§16 claims revised before the pitch is finalized, not after.
+- **Forecast component:** fitting ARIMA_PLUS on a ~104-point synthetic series (§11) is a batch job measured in minutes, done during data seeding, well before any demo rehearsal — there is no live dependency and no plausible build-time failure mode left to hedge against. This is the one component this PRD treats as fully closed, not contingent on anything.
 - **Voice I/O failure during judging:** the demo script (§16) carries a scripted recovery step. If live transcription misfires, the presenter falls back to the confirm/edit path already built into the farmer flow (§8.1.2) and narrates it as the designed safety net, not an error. A second, pre-recorded clean take of the same voice interaction is held in reserve as the literal fallback if live input fails twice.
-- **Live-service surface:** the MVP integrates nine GCP services. Moving the forecast off the live path (above) removes one dependency from the demo's critical path on purpose; Pub/Sub+FCM and the solver stay live because they're the actual proof points for "live matching," the core claim of the pitch.
+- **Live-service surface:** the MVP integrates eight GCP services (down from nine in v1/v2 — §12 dropped Pub/Sub+FCM for Firestore listeners, which the frontend already needs for live updates regardless). The forecast is off the live path entirely (above). The solver and the Gemini/STT/TTS loop are the only pieces still live during the actual demo, and they're also the two things the pitch is actually claiming credit for — everything else is infrastructure, not a claimed capability.
 
 ## 14. Success metrics mapped to judging criteria
 
-- **Technical Merit & Gen AI (40%):** live Gemini + STT/TTS loop, a deterministic OR-Tools solver that re-runs live on every new listing, and a BigQuery ML forecast trained offline and served from Firestore (§12) — every component here is a locked decision, not an open choice.
+- **Technical Merit & Gen AI (40%):** live Gemini + STT/TTS loop, a deterministic OR-Tools solver that re-runs live on every new listing, and a BigQuery ML forecast trained on a real ~104-point-per-series corpus (§11, §12) rather than the small live-demo seed set — eight integrated services total, down to the two that actually run live during judging (§13.1).
 - **Problem Alignment & Impact (25%):** direct, concrete tie to stubble burning and Delhi air quality (§5); a specific causal lever (speed + certainty beating burning), not a generic climate dashboard, plus a stated path from simulated to real transactions (§5).
-- **Innovation & Creativity (25%):** Gemini-as-interface + OR-Tools-as-decision-engine hybrid, not a pure LLM wrapper; dual-sided (farmer + company) product from one matching core; see §7.1 for the specific argument against the three existing approaches in this space, not just an assertion of novelty.
-- **UX & Solution Design (10%):** bilingual voice-first farmer experience (§8.1), a four-zone company dashboard (§8.2), one cohesive flow rather than three disjoint tools.
+- **Innovation & Creativity (25%):** Gemini-as-interface + OR-Tools-as-decision-engine hybrid, not a pure LLM wrapper; dual-sided (farmer + company) product from one matching core; see §7.1 for the specific accumulated-transaction-data mechanism, not a generic flywheel claim.
+- **UX & Solution Design (10%):** bilingual voice-first farmer experience (§8.1), a laid-out company dashboard with a defined interaction model (§8.2), one cohesive flow rather than three disjoint tools.
 
 ## 15. MVP cut vs. stretch goals
 
@@ -178,8 +193,8 @@ Everything left of the solver is language (Gemini + STT/TTS). Everything through
 - Farmer flow steps 1–7, voice + text, Hindi + Punjabi.
 - Company flow steps 1–4, including the simulated confirm-pickup/confirm-payment step.
 - Live solver re-run triggered by each new listing.
-- One seasonal forecast example surfaced on the company dashboard (e.g., pre-Navratri plate demand in Gujarat).
-- Synthetic seed dataset: roughly 15–20 farmer listings, 5 companies.
+- One seasonal forecast example surfaced on the company dashboard (e.g., pre-Navratri plate demand in Gujarat), generated offline from the ~104-point historical corpus (§11) — not from the small live-demo dataset below.
+- Synthetic seed dataset for the *live demo* itself: roughly 15–20 farmer listings, 5 companies. This is separate from the larger historical corpus used only to train the forecast (§11, §12).
 
 **Stretch (only if time remains):**
 - Live Agmarknet price feed as a real-time sanity-check on offered prices.
