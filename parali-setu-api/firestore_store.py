@@ -128,3 +128,12 @@ def append_negotiation_log(db: firestore.Client, match_id: str, entry: dict) -> 
 
 def update_match_price(db: firestore.Client, match_id: str, new_price_per_kg: float) -> None:
     db.collection("matches").document(match_id).update({"price_agreed_per_kg": new_price_per_kg})
+
+
+def get_forecast_for_company(db: firestore.Client, company_id: str) -> dict | None:
+    """Reads whatever forecast_pipeline.py last wrote (PRD 12/13.1) --
+    never computed here, never live. None if the pipeline hasn't run for
+    this company yet; callers must show 'not yet available', not a
+    fabricated recommendation (PRD 8.2.2)."""
+    doc = db.collection("forecasts").document(f"forecast_{company_id}").get()
+    return doc.to_dict() if doc.exists else None

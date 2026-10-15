@@ -89,16 +89,23 @@ def generate_demo_demand(seed: int = 42) -> list[Demand]:
     return demands
 
 
-def generate_forecast_corpus(seed: int = 7, weeks: int = 104) -> list[dict]:
+def generate_forecast_corpus(seed: int = 7, weeks: int = 104, end_date: date | None = None) -> list[dict]:
     """~2 synthetic years of weekly demand per product/region series (Section 11).
 
     Pattern-based: a flat baseline plus a festival bump in the Navratri/
     Diwali weeks and mild noise. This proves the forecasting pipeline and
     gives a directionally plausible example -- it is not a claim of
     real-world forecast accuracy (PRD Section 13.1).
+
+    `end_date` anchors the corpus to end near today (default) rather than
+    a fixed calendar date -- found live (not hypothetical): with a
+    hardcoded 2024-01-01 start, BigQuery ML's forecast horizon landed in
+    Dec 2025-Feb 2026, in the past relative to the actual demo date and
+    nowhere near the festival season the demo narrative depends on.
     """
     rng = random.Random(seed)
-    start = date(2024, 1, 1)
+    end_date = end_date or date.today()
+    start = end_date - timedelta(weeks=weeks)
     rows = []
     for co in COMPANY_SEEDS:
         baseline = rng.uniform(2000, 4000)

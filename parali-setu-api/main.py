@@ -189,16 +189,17 @@ def create_demand(company_id: str, req: DemandRequest):
 
 @app.get("/companies/{company_id}/dashboard")
 def company_dashboard(company_id: str):
-    """PRD 8.2.2 -- Incoming Supply + Active Matches zones. The
-    Recommendation panel (forecast-driven) is wired once the BigQuery ML
-    pipeline (Phase 4 of Section 15.1) exists -- this returns an explicit
-    'not yet available' rather than a fabricated card in the meantime."""
+    """PRD 8.2.2: Incoming Supply, Active Matches, and the Recommendation
+    panel -- read from whatever forecast_pipeline.py last wrote to
+    Firestore, never computed here. A company with no forecast doc yet
+    gets an explicit 'not yet available', never a fabricated card."""
     db = store.get_firestore_client()
     matches = store.get_matches_for_company(db, company_id)
+    forecast = store.get_forecast_for_company(db, company_id)
     return {
         "incoming_supply": sorted(matches, key=lambda m: m.get("price_agreed_per_kg", 0), reverse=True),
         "active_matches": matches,
-        "recommendation": None,
+        "recommendation": forecast,
     }
 
 

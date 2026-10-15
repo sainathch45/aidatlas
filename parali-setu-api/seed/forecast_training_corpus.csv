@@ -1,521 +1,521 @@
 company_id,product,region,week_start,demand_units
-co_1,disposable_plates,Gujarat,2024-01-01,2499.8
-co_1,disposable_plates,Gujarat,2024-01-08,2744.3
-co_1,disposable_plates,Gujarat,2024-01-15,2525.6
-co_1,disposable_plates,Gujarat,2024-01-22,2757.3
-co_1,disposable_plates,Gujarat,2024-01-29,2711.2
-co_1,disposable_plates,Gujarat,2024-02-05,2600.2
-co_1,disposable_plates,Gujarat,2024-02-12,2826.6
-co_1,disposable_plates,Gujarat,2024-02-19,2635.3
-co_1,disposable_plates,Gujarat,2024-02-26,2835.1
-co_1,disposable_plates,Gujarat,2024-03-04,2683.7
-co_1,disposable_plates,Gujarat,2024-03-11,2705.6
-co_1,disposable_plates,Gujarat,2024-03-18,2869.7
-co_1,disposable_plates,Gujarat,2024-03-25,3062.7
-co_1,disposable_plates,Gujarat,2024-04-01,2737.1
-co_1,disposable_plates,Gujarat,2024-04-08,2781.6
-co_1,disposable_plates,Gujarat,2024-04-15,2964.0
-co_1,disposable_plates,Gujarat,2024-04-22,3102.6
-co_1,disposable_plates,Gujarat,2024-04-29,2917.7
-co_1,disposable_plates,Gujarat,2024-05-06,2818.2
-co_1,disposable_plates,Gujarat,2024-05-13,3062.7
-co_1,disposable_plates,Gujarat,2024-05-20,2618.4
-co_1,disposable_plates,Gujarat,2024-05-27,2958.6
-co_1,disposable_plates,Gujarat,2024-06-03,2677.4
-co_1,disposable_plates,Gujarat,2024-06-10,2585.5
-co_1,disposable_plates,Gujarat,2024-06-17,2545.2
-co_1,disposable_plates,Gujarat,2024-06-24,2597.5
-co_1,disposable_plates,Gujarat,2024-07-01,2781.6
-co_1,disposable_plates,Gujarat,2024-07-08,2482.1
-co_1,disposable_plates,Gujarat,2024-07-15,2618.0
-co_1,disposable_plates,Gujarat,2024-07-22,2610.5
-co_1,disposable_plates,Gujarat,2024-07-29,2473.1
-co_1,disposable_plates,Gujarat,2024-08-05,2516.3
-co_1,disposable_plates,Gujarat,2024-08-12,2299.2
-co_1,disposable_plates,Gujarat,2024-08-19,2276.9
-co_1,disposable_plates,Gujarat,2024-08-26,2315.5
-co_1,disposable_plates,Gujarat,2024-09-02,2482.9
-co_1,disposable_plates,Gujarat,2024-09-09,2372.3
-co_1,disposable_plates,Gujarat,2024-09-16,2319.5
-co_1,disposable_plates,Gujarat,2024-09-23,4351.5
-co_1,disposable_plates,Gujarat,2024-09-30,4257.1
-co_1,disposable_plates,Gujarat,2024-10-07,4155.2
-co_1,disposable_plates,Gujarat,2024-10-14,2503.2
-co_1,disposable_plates,Gujarat,2024-10-21,2476.5
-co_1,disposable_plates,Gujarat,2024-10-28,4166.0
-co_1,disposable_plates,Gujarat,2024-11-04,4425.7
-co_1,disposable_plates,Gujarat,2024-11-11,2459.4
-co_1,disposable_plates,Gujarat,2024-11-18,2620.5
-co_1,disposable_plates,Gujarat,2024-11-25,2588.9
-co_1,disposable_plates,Gujarat,2024-12-02,2439.0
-co_1,disposable_plates,Gujarat,2024-12-09,2750.0
-co_1,disposable_plates,Gujarat,2024-12-16,2426.4
-co_1,disposable_plates,Gujarat,2024-12-23,2581.5
-co_1,disposable_plates,Gujarat,2024-12-30,2756.6
-co_1,disposable_plates,Gujarat,2025-01-06,2530.4
-co_1,disposable_plates,Gujarat,2025-01-13,2706.2
-co_1,disposable_plates,Gujarat,2025-01-20,2539.4
-co_1,disposable_plates,Gujarat,2025-01-27,2845.3
-co_1,disposable_plates,Gujarat,2025-02-03,2916.5
-co_1,disposable_plates,Gujarat,2025-02-10,2856.2
-co_1,disposable_plates,Gujarat,2025-02-17,3016.8
-co_1,disposable_plates,Gujarat,2025-02-24,2780.2
-co_1,disposable_plates,Gujarat,2025-03-03,2972.2
-co_1,disposable_plates,Gujarat,2025-03-10,2938.9
-co_1,disposable_plates,Gujarat,2025-03-17,2941.9
-co_1,disposable_plates,Gujarat,2025-03-24,2890.1
-co_1,disposable_plates,Gujarat,2025-03-31,3070.9
-co_1,disposable_plates,Gujarat,2025-04-07,3117.6
-co_1,disposable_plates,Gujarat,2025-04-14,2892.7
-co_1,disposable_plates,Gujarat,2025-04-21,2971.3
-co_1,disposable_plates,Gujarat,2025-04-28,2679.5
-co_1,disposable_plates,Gujarat,2025-05-05,2957.9
-co_1,disposable_plates,Gujarat,2025-05-12,2912.8
-co_1,disposable_plates,Gujarat,2025-05-19,3046.0
-co_1,disposable_plates,Gujarat,2025-05-26,2942.2
-co_1,disposable_plates,Gujarat,2025-06-02,2675.2
-co_1,disposable_plates,Gujarat,2025-06-09,2691.5
-co_1,disposable_plates,Gujarat,2025-06-16,2784.2
-co_1,disposable_plates,Gujarat,2025-06-23,2474.9
-co_1,disposable_plates,Gujarat,2025-06-30,2631.4
-co_1,disposable_plates,Gujarat,2025-07-07,2476.8
-co_1,disposable_plates,Gujarat,2025-07-14,2426.0
-co_1,disposable_plates,Gujarat,2025-07-21,2373.6
-co_1,disposable_plates,Gujarat,2025-07-28,2633.0
-co_1,disposable_plates,Gujarat,2025-08-04,2349.2
-co_1,disposable_plates,Gujarat,2025-08-11,2372.3
-co_1,disposable_plates,Gujarat,2025-08-18,2406.7
-co_1,disposable_plates,Gujarat,2025-08-25,2574.2
-co_1,disposable_plates,Gujarat,2025-09-01,2251.3
-co_1,disposable_plates,Gujarat,2025-09-08,2380.6
-co_1,disposable_plates,Gujarat,2025-09-15,2409.5
-co_1,disposable_plates,Gujarat,2025-09-22,4556.0
-co_1,disposable_plates,Gujarat,2025-09-29,4508.3
-co_1,disposable_plates,Gujarat,2025-10-06,4542.7
-co_1,disposable_plates,Gujarat,2025-10-13,2305.8
-co_1,disposable_plates,Gujarat,2025-10-20,2367.6
-co_1,disposable_plates,Gujarat,2025-10-27,4245.7
-co_1,disposable_plates,Gujarat,2025-11-03,4642.4
-co_1,disposable_plates,Gujarat,2025-11-10,2628.9
-co_1,disposable_plates,Gujarat,2025-11-17,2334.0
-co_1,disposable_plates,Gujarat,2025-11-24,2367.9
-co_1,disposable_plates,Gujarat,2025-12-01,2416.3
-co_1,disposable_plates,Gujarat,2025-12-08,2444.8
-co_1,disposable_plates,Gujarat,2025-12-15,2578.1
-co_1,disposable_plates,Gujarat,2025-12-22,2653.1
-co_2,biofuel_pellets,Punjab,2024-01-01,2325.1
-co_2,biofuel_pellets,Punjab,2024-01-08,2522.8
-co_2,biofuel_pellets,Punjab,2024-01-15,2531.8
-co_2,biofuel_pellets,Punjab,2024-01-22,2642.8
-co_2,biofuel_pellets,Punjab,2024-01-29,2834.5
-co_2,biofuel_pellets,Punjab,2024-02-05,2750.3
-co_2,biofuel_pellets,Punjab,2024-02-12,2699.6
-co_2,biofuel_pellets,Punjab,2024-02-19,2765.6
-co_2,biofuel_pellets,Punjab,2024-02-26,2810.4
-co_2,biofuel_pellets,Punjab,2024-03-04,2552.9
-co_2,biofuel_pellets,Punjab,2024-03-11,2938.2
-co_2,biofuel_pellets,Punjab,2024-03-18,2894.8
-co_2,biofuel_pellets,Punjab,2024-03-25,2942.6
-co_2,biofuel_pellets,Punjab,2024-04-01,2910.4
-co_2,biofuel_pellets,Punjab,2024-04-08,2728.4
-co_2,biofuel_pellets,Punjab,2024-04-15,2725.9
-co_2,biofuel_pellets,Punjab,2024-04-22,2586.4
-co_2,biofuel_pellets,Punjab,2024-04-29,2808.2
-co_2,biofuel_pellets,Punjab,2024-05-06,2541.9
-co_2,biofuel_pellets,Punjab,2024-05-13,2526.6
-co_2,biofuel_pellets,Punjab,2024-05-20,2567.5
-co_2,biofuel_pellets,Punjab,2024-05-27,2524.7
-co_2,biofuel_pellets,Punjab,2024-06-03,2575.2
-co_2,biofuel_pellets,Punjab,2024-06-10,2427.8
-co_2,biofuel_pellets,Punjab,2024-06-17,2379.2
-co_2,biofuel_pellets,Punjab,2024-06-24,2413.3
-co_2,biofuel_pellets,Punjab,2024-07-01,2364.5
-co_2,biofuel_pellets,Punjab,2024-07-08,2440.6
-co_2,biofuel_pellets,Punjab,2024-07-15,2277.9
-co_2,biofuel_pellets,Punjab,2024-07-22,2581.8
-co_2,biofuel_pellets,Punjab,2024-07-29,2452.1
-co_2,biofuel_pellets,Punjab,2024-08-05,2248.1
-co_2,biofuel_pellets,Punjab,2024-08-12,2264.6
-co_2,biofuel_pellets,Punjab,2024-08-19,2279.4
-co_2,biofuel_pellets,Punjab,2024-08-26,2267.3
-co_2,biofuel_pellets,Punjab,2024-09-02,2163.0
-co_2,biofuel_pellets,Punjab,2024-09-09,2417.2
-co_2,biofuel_pellets,Punjab,2024-09-16,2460.2
-co_2,biofuel_pellets,Punjab,2024-09-23,4072.3
-co_2,biofuel_pellets,Punjab,2024-09-30,4080.7
-co_2,biofuel_pellets,Punjab,2024-10-07,3823.3
-co_2,biofuel_pellets,Punjab,2024-10-14,2135.1
-co_2,biofuel_pellets,Punjab,2024-10-21,2231.7
-co_2,biofuel_pellets,Punjab,2024-10-28,3987.4
-co_2,biofuel_pellets,Punjab,2024-11-04,4391.3
-co_2,biofuel_pellets,Punjab,2024-11-11,2209.9
-co_2,biofuel_pellets,Punjab,2024-11-18,2178.1
-co_2,biofuel_pellets,Punjab,2024-11-25,2553.9
-co_2,biofuel_pellets,Punjab,2024-12-02,2419.0
-co_2,biofuel_pellets,Punjab,2024-12-09,2298.2
-co_2,biofuel_pellets,Punjab,2024-12-16,2482.1
-co_2,biofuel_pellets,Punjab,2024-12-23,2306.2
-co_2,biofuel_pellets,Punjab,2024-12-30,2536.9
-co_2,biofuel_pellets,Punjab,2025-01-06,2751.6
-co_2,biofuel_pellets,Punjab,2025-01-13,2736.3
-co_2,biofuel_pellets,Punjab,2025-01-20,2697.1
-co_2,biofuel_pellets,Punjab,2025-01-27,2541.8
-co_2,biofuel_pellets,Punjab,2025-02-03,2612.0
-co_2,biofuel_pellets,Punjab,2025-02-10,2549.5
-co_2,biofuel_pellets,Punjab,2025-02-17,2832.6
-co_2,biofuel_pellets,Punjab,2025-02-24,2747.6
-co_2,biofuel_pellets,Punjab,2025-03-03,2871.9
-co_2,biofuel_pellets,Punjab,2025-03-10,2686.4
-co_2,biofuel_pellets,Punjab,2025-03-17,2647.9
-co_2,biofuel_pellets,Punjab,2025-03-24,2914.6
-co_2,biofuel_pellets,Punjab,2025-03-31,2993.6
-co_2,biofuel_pellets,Punjab,2025-04-07,2932.8
-co_2,biofuel_pellets,Punjab,2025-04-14,2906.4
-co_2,biofuel_pellets,Punjab,2025-04-21,2902.3
-co_2,biofuel_pellets,Punjab,2025-04-28,2854.6
-co_2,biofuel_pellets,Punjab,2025-05-05,2613.8
-co_2,biofuel_pellets,Punjab,2025-05-12,2722.2
-co_2,biofuel_pellets,Punjab,2025-05-19,2630.7
-co_2,biofuel_pellets,Punjab,2025-05-26,2467.8
-co_2,biofuel_pellets,Punjab,2025-06-02,2443.2
-co_2,biofuel_pellets,Punjab,2025-06-09,2522.8
-co_2,biofuel_pellets,Punjab,2025-06-16,2486.3
-co_2,biofuel_pellets,Punjab,2025-06-23,2634.7
-co_2,biofuel_pellets,Punjab,2025-06-30,2710.0
-co_2,biofuel_pellets,Punjab,2025-07-07,2474.0
-co_2,biofuel_pellets,Punjab,2025-07-14,2637.4
-co_2,biofuel_pellets,Punjab,2025-07-21,2626.2
-co_2,biofuel_pellets,Punjab,2025-07-28,2583.4
-co_2,biofuel_pellets,Punjab,2025-08-04,2330.4
-co_2,biofuel_pellets,Punjab,2025-08-11,2252.6
-co_2,biofuel_pellets,Punjab,2025-08-18,2234.3
-co_2,biofuel_pellets,Punjab,2025-08-25,2205.2
-co_2,biofuel_pellets,Punjab,2025-09-01,2193.0
-co_2,biofuel_pellets,Punjab,2025-09-08,2334.8
-co_2,biofuel_pellets,Punjab,2025-09-15,2426.3
-co_2,biofuel_pellets,Punjab,2025-09-22,4317.6
-co_2,biofuel_pellets,Punjab,2025-09-29,4077.9
-co_2,biofuel_pellets,Punjab,2025-10-06,4194.8
-co_2,biofuel_pellets,Punjab,2025-10-13,2389.6
-co_2,biofuel_pellets,Punjab,2025-10-20,2137.3
-co_2,biofuel_pellets,Punjab,2025-10-27,4249.8
-co_2,biofuel_pellets,Punjab,2025-11-03,4445.3
-co_2,biofuel_pellets,Punjab,2025-11-10,2442.0
-co_2,biofuel_pellets,Punjab,2025-11-17,2452.4
-co_2,biofuel_pellets,Punjab,2025-11-24,2373.7
-co_2,biofuel_pellets,Punjab,2025-12-01,2284.3
-co_2,biofuel_pellets,Punjab,2025-12-08,2548.6
-co_2,biofuel_pellets,Punjab,2025-12-15,2399.0
-co_2,biofuel_pellets,Punjab,2025-12-22,2615.1
-co_3,packaging_board,West Bengal,2024-01-01,3877.6
-co_3,packaging_board,West Bengal,2024-01-08,3927.9
-co_3,packaging_board,West Bengal,2024-01-15,4326.3
-co_3,packaging_board,West Bengal,2024-01-22,4230.0
-co_3,packaging_board,West Bengal,2024-01-29,3908.7
-co_3,packaging_board,West Bengal,2024-02-05,3918.6
-co_3,packaging_board,West Bengal,2024-02-12,3970.1
-co_3,packaging_board,West Bengal,2024-02-19,4513.0
-co_3,packaging_board,West Bengal,2024-02-26,4477.1
-co_3,packaging_board,West Bengal,2024-03-04,4049.5
-co_3,packaging_board,West Bengal,2024-03-11,4537.3
-co_3,packaging_board,West Bengal,2024-03-18,4658.7
-co_3,packaging_board,West Bengal,2024-03-25,4443.8
-co_3,packaging_board,West Bengal,2024-04-01,4233.8
-co_3,packaging_board,West Bengal,2024-04-08,4368.5
-co_3,packaging_board,West Bengal,2024-04-15,4070.8
-co_3,packaging_board,West Bengal,2024-04-22,3976.9
-co_3,packaging_board,West Bengal,2024-04-29,4615.9
-co_3,packaging_board,West Bengal,2024-05-06,4370.0
-co_3,packaging_board,West Bengal,2024-05-13,4256.5
-co_3,packaging_board,West Bengal,2024-05-20,4496.5
-co_3,packaging_board,West Bengal,2024-05-27,4123.2
-co_3,packaging_board,West Bengal,2024-06-03,4372.0
-co_3,packaging_board,West Bengal,2024-06-10,4296.2
-co_3,packaging_board,West Bengal,2024-06-17,3851.0
-co_3,packaging_board,West Bengal,2024-06-24,3832.4
-co_3,packaging_board,West Bengal,2024-07-01,3812.7
-co_3,packaging_board,West Bengal,2024-07-08,3734.1
-co_3,packaging_board,West Bengal,2024-07-15,3902.2
-co_3,packaging_board,West Bengal,2024-07-22,3657.0
-co_3,packaging_board,West Bengal,2024-07-29,3711.3
-co_3,packaging_board,West Bengal,2024-08-05,3499.8
-co_3,packaging_board,West Bengal,2024-08-12,3923.4
-co_3,packaging_board,West Bengal,2024-08-19,3562.8
-co_3,packaging_board,West Bengal,2024-08-26,3594.6
-co_3,packaging_board,West Bengal,2024-09-02,3642.1
-co_3,packaging_board,West Bengal,2024-09-09,3805.8
-co_3,packaging_board,West Bengal,2024-09-16,3515.2
-co_3,packaging_board,West Bengal,2024-09-23,6820.6
-co_3,packaging_board,West Bengal,2024-09-30,6389.9
-co_3,packaging_board,West Bengal,2024-10-07,6425.9
-co_3,packaging_board,West Bengal,2024-10-14,3573.8
-co_3,packaging_board,West Bengal,2024-10-21,3299.3
-co_3,packaging_board,West Bengal,2024-10-28,6407.5
-co_3,packaging_board,West Bengal,2024-11-04,6183.5
-co_3,packaging_board,West Bengal,2024-11-11,3358.6
-co_3,packaging_board,West Bengal,2024-11-18,3858.1
-co_3,packaging_board,West Bengal,2024-11-25,3524.3
-co_3,packaging_board,West Bengal,2024-12-02,3744.1
-co_3,packaging_board,West Bengal,2024-12-09,3940.5
-co_3,packaging_board,West Bengal,2024-12-16,3883.7
-co_3,packaging_board,West Bengal,2024-12-23,3787.3
-co_3,packaging_board,West Bengal,2024-12-30,3954.9
-co_3,packaging_board,West Bengal,2025-01-06,4026.2
-co_3,packaging_board,West Bengal,2025-01-13,4221.3
-co_3,packaging_board,West Bengal,2025-01-20,3825.8
-co_3,packaging_board,West Bengal,2025-01-27,4166.4
-co_3,packaging_board,West Bengal,2025-02-03,3999.6
-co_3,packaging_board,West Bengal,2025-02-10,4054.7
-co_3,packaging_board,West Bengal,2025-02-17,4423.1
-co_3,packaging_board,West Bengal,2025-02-24,4273.1
-co_3,packaging_board,West Bengal,2025-03-03,4334.9
-co_3,packaging_board,West Bengal,2025-03-10,4491.4
-co_3,packaging_board,West Bengal,2025-03-17,4611.7
-co_3,packaging_board,West Bengal,2025-03-24,4295.4
-co_3,packaging_board,West Bengal,2025-03-31,4415.7
-co_3,packaging_board,West Bengal,2025-04-07,4338.6
-co_3,packaging_board,West Bengal,2025-04-14,4334.6
-co_3,packaging_board,West Bengal,2025-04-21,4445.0
-co_3,packaging_board,West Bengal,2025-04-28,4259.7
-co_3,packaging_board,West Bengal,2025-05-05,4290.6
-co_3,packaging_board,West Bengal,2025-05-12,4223.6
-co_3,packaging_board,West Bengal,2025-05-19,4501.8
-co_3,packaging_board,West Bengal,2025-05-26,4300.2
-co_3,packaging_board,West Bengal,2025-06-02,4375.2
-co_3,packaging_board,West Bengal,2025-06-09,4372.0
-co_3,packaging_board,West Bengal,2025-06-16,3882.4
-co_3,packaging_board,West Bengal,2025-06-23,4028.8
-co_3,packaging_board,West Bengal,2025-06-30,4223.0
-co_3,packaging_board,West Bengal,2025-07-07,4107.7
-co_3,packaging_board,West Bengal,2025-07-14,3625.5
-co_3,packaging_board,West Bengal,2025-07-21,3573.2
-co_3,packaging_board,West Bengal,2025-07-28,3725.2
-co_3,packaging_board,West Bengal,2025-08-04,3464.9
-co_3,packaging_board,West Bengal,2025-08-11,3529.0
-co_3,packaging_board,West Bengal,2025-08-18,3399.0
-co_3,packaging_board,West Bengal,2025-08-25,3716.9
-co_3,packaging_board,West Bengal,2025-09-01,3757.4
-co_3,packaging_board,West Bengal,2025-09-08,3801.7
-co_3,packaging_board,West Bengal,2025-09-15,3363.6
-co_3,packaging_board,West Bengal,2025-09-22,6614.4
-co_3,packaging_board,West Bengal,2025-09-29,6552.0
-co_3,packaging_board,West Bengal,2025-10-06,6028.1
-co_3,packaging_board,West Bengal,2025-10-13,3778.5
-co_3,packaging_board,West Bengal,2025-10-20,3842.0
-co_3,packaging_board,West Bengal,2025-10-27,6179.2
-co_3,packaging_board,West Bengal,2025-11-03,6985.4
-co_3,packaging_board,West Bengal,2025-11-10,3588.8
-co_3,packaging_board,West Bengal,2025-11-17,3674.3
-co_3,packaging_board,West Bengal,2025-11-24,4010.8
-co_3,packaging_board,West Bengal,2025-12-01,3960.1
-co_3,packaging_board,West Bengal,2025-12-08,3597.5
-co_3,packaging_board,West Bengal,2025-12-15,3806.8
-co_3,packaging_board,West Bengal,2025-12-22,3905.5
-co_4,road_composite,Haryana,2024-01-01,2547.9
-co_4,road_composite,Haryana,2024-01-08,2631.8
-co_4,road_composite,Haryana,2024-01-15,2839.8
-co_4,road_composite,Haryana,2024-01-22,2560.0
-co_4,road_composite,Haryana,2024-01-29,2826.9
-co_4,road_composite,Haryana,2024-02-05,2803.4
-co_4,road_composite,Haryana,2024-02-12,2635.6
-co_4,road_composite,Haryana,2024-02-19,2801.1
-co_4,road_composite,Haryana,2024-02-26,2956.1
-co_4,road_composite,Haryana,2024-03-04,2921.1
-co_4,road_composite,Haryana,2024-03-11,2724.5
-co_4,road_composite,Haryana,2024-03-18,3166.3
-co_4,road_composite,Haryana,2024-03-25,3079.9
-co_4,road_composite,Haryana,2024-04-01,3168.4
-co_4,road_composite,Haryana,2024-04-08,2757.9
-co_4,road_composite,Haryana,2024-04-15,2828.1
-co_4,road_composite,Haryana,2024-04-22,2712.9
-co_4,road_composite,Haryana,2024-04-29,3045.5
-co_4,road_composite,Haryana,2024-05-06,2792.2
-co_4,road_composite,Haryana,2024-05-13,2708.1
-co_4,road_composite,Haryana,2024-05-20,2820.3
-co_4,road_composite,Haryana,2024-05-27,3016.7
-co_4,road_composite,Haryana,2024-06-03,2945.7
-co_4,road_composite,Haryana,2024-06-10,2666.1
-co_4,road_composite,Haryana,2024-06-17,2588.5
-co_4,road_composite,Haryana,2024-06-24,2892.3
-co_4,road_composite,Haryana,2024-07-01,2708.5
-co_4,road_composite,Haryana,2024-07-08,2730.8
-co_4,road_composite,Haryana,2024-07-15,2442.4
-co_4,road_composite,Haryana,2024-07-22,2400.4
-co_4,road_composite,Haryana,2024-07-29,2630.7
-co_4,road_composite,Haryana,2024-08-05,2495.9
-co_4,road_composite,Haryana,2024-08-12,2329.6
-co_4,road_composite,Haryana,2024-08-19,2651.5
-co_4,road_composite,Haryana,2024-08-26,2510.7
-co_4,road_composite,Haryana,2024-09-02,2558.9
-co_4,road_composite,Haryana,2024-09-09,2266.1
-co_4,road_composite,Haryana,2024-09-16,2556.0
-co_4,road_composite,Haryana,2024-09-23,4041.2
-co_4,road_composite,Haryana,2024-09-30,4590.6
-co_4,road_composite,Haryana,2024-10-07,4310.1
-co_4,road_composite,Haryana,2024-10-14,2356.0
-co_4,road_composite,Haryana,2024-10-21,2448.4
-co_4,road_composite,Haryana,2024-10-28,4693.9
-co_4,road_composite,Haryana,2024-11-04,4259.8
-co_4,road_composite,Haryana,2024-11-11,2330.8
-co_4,road_composite,Haryana,2024-11-18,2511.4
-co_4,road_composite,Haryana,2024-11-25,2420.4
-co_4,road_composite,Haryana,2024-12-02,2394.2
-co_4,road_composite,Haryana,2024-12-09,2443.3
-co_4,road_composite,Haryana,2024-12-16,2426.1
-co_4,road_composite,Haryana,2024-12-23,2519.7
-co_4,road_composite,Haryana,2024-12-30,2597.7
-co_4,road_composite,Haryana,2025-01-06,2625.9
-co_4,road_composite,Haryana,2025-01-13,2856.2
-co_4,road_composite,Haryana,2025-01-20,2680.0
-co_4,road_composite,Haryana,2025-01-27,2802.7
-co_4,road_composite,Haryana,2025-02-03,2684.5
-co_4,road_composite,Haryana,2025-02-10,2785.9
-co_4,road_composite,Haryana,2025-02-17,2656.8
-co_4,road_composite,Haryana,2025-02-24,2782.9
-co_4,road_composite,Haryana,2025-03-03,2689.3
-co_4,road_composite,Haryana,2025-03-10,3037.9
-co_4,road_composite,Haryana,2025-03-17,2962.3
-co_4,road_composite,Haryana,2025-03-24,2797.8
-co_4,road_composite,Haryana,2025-03-31,2934.2
-co_4,road_composite,Haryana,2025-04-07,3148.8
-co_4,road_composite,Haryana,2025-04-14,2753.2
-co_4,road_composite,Haryana,2025-04-21,3078.1
-co_4,road_composite,Haryana,2025-04-28,2883.7
-co_4,road_composite,Haryana,2025-05-05,2896.3
-co_4,road_composite,Haryana,2025-05-12,3032.8
-co_4,road_composite,Haryana,2025-05-19,2807.0
-co_4,road_composite,Haryana,2025-05-26,2833.4
-co_4,road_composite,Haryana,2025-06-02,2886.9
-co_4,road_composite,Haryana,2025-06-09,2987.3
-co_4,road_composite,Haryana,2025-06-16,2673.3
-co_4,road_composite,Haryana,2025-06-23,2854.6
-co_4,road_composite,Haryana,2025-06-30,2766.8
-co_4,road_composite,Haryana,2025-07-07,2703.5
-co_4,road_composite,Haryana,2025-07-14,2574.3
-co_4,road_composite,Haryana,2025-07-21,2520.3
-co_4,road_composite,Haryana,2025-07-28,2371.7
-co_4,road_composite,Haryana,2025-08-04,2376.5
-co_4,road_composite,Haryana,2025-08-11,2328.9
-co_4,road_composite,Haryana,2025-08-18,2573.3
-co_4,road_composite,Haryana,2025-08-25,2361.7
-co_4,road_composite,Haryana,2025-09-01,2309.6
-co_4,road_composite,Haryana,2025-09-08,2266.4
-co_4,road_composite,Haryana,2025-09-15,2550.2
-co_4,road_composite,Haryana,2025-09-22,4599.7
-co_4,road_composite,Haryana,2025-09-29,4457.1
-co_4,road_composite,Haryana,2025-10-06,4190.7
-co_4,road_composite,Haryana,2025-10-13,2318.5
-co_4,road_composite,Haryana,2025-10-20,2347.4
-co_4,road_composite,Haryana,2025-10-27,4365.4
-co_4,road_composite,Haryana,2025-11-03,4181.7
-co_4,road_composite,Haryana,2025-11-10,2456.3
-co_4,road_composite,Haryana,2025-11-17,2405.9
-co_4,road_composite,Haryana,2025-11-24,2712.7
-co_4,road_composite,Haryana,2025-12-01,2746.9
-co_4,road_composite,Haryana,2025-12-08,2602.7
-co_4,road_composite,Haryana,2025-12-15,2507.2
-co_4,road_composite,Haryana,2025-12-22,2843.1
-co_5,disposable_plates,Delhi,2024-01-01,2559.0
-co_5,disposable_plates,Delhi,2024-01-08,2439.1
-co_5,disposable_plates,Delhi,2024-01-15,2631.0
-co_5,disposable_plates,Delhi,2024-01-22,2701.0
-co_5,disposable_plates,Delhi,2024-01-29,2742.0
-co_5,disposable_plates,Delhi,2024-02-05,2635.5
-co_5,disposable_plates,Delhi,2024-02-12,2794.9
-co_5,disposable_plates,Delhi,2024-02-19,2592.2
-co_5,disposable_plates,Delhi,2024-02-26,2727.7
-co_5,disposable_plates,Delhi,2024-03-04,2663.9
-co_5,disposable_plates,Delhi,2024-03-11,2817.9
-co_5,disposable_plates,Delhi,2024-03-18,2662.7
-co_5,disposable_plates,Delhi,2024-03-25,2659.1
-co_5,disposable_plates,Delhi,2024-04-01,2790.8
-co_5,disposable_plates,Delhi,2024-04-08,2756.0
-co_5,disposable_plates,Delhi,2024-04-15,2912.7
-co_5,disposable_plates,Delhi,2024-04-22,2877.4
-co_5,disposable_plates,Delhi,2024-04-29,2965.3
-co_5,disposable_plates,Delhi,2024-05-06,2906.1
-co_5,disposable_plates,Delhi,2024-05-13,2912.4
-co_5,disposable_plates,Delhi,2024-05-20,2962.2
-co_5,disposable_plates,Delhi,2024-05-27,2718.9
-co_5,disposable_plates,Delhi,2024-06-03,2664.6
-co_5,disposable_plates,Delhi,2024-06-10,2922.3
-co_5,disposable_plates,Delhi,2024-06-17,2531.4
-co_5,disposable_plates,Delhi,2024-06-24,2745.7
-co_5,disposable_plates,Delhi,2024-07-01,2679.1
-co_5,disposable_plates,Delhi,2024-07-08,2398.7
-co_5,disposable_plates,Delhi,2024-07-15,2693.6
-co_5,disposable_plates,Delhi,2024-07-22,2684.6
-co_5,disposable_plates,Delhi,2024-07-29,2548.3
-co_5,disposable_plates,Delhi,2024-08-05,2562.7
-co_5,disposable_plates,Delhi,2024-08-12,2567.6
-co_5,disposable_plates,Delhi,2024-08-19,2283.2
-co_5,disposable_plates,Delhi,2024-08-26,2412.7
-co_5,disposable_plates,Delhi,2024-09-02,2388.9
-co_5,disposable_plates,Delhi,2024-09-09,2501.4
-co_5,disposable_plates,Delhi,2024-09-16,2480.1
-co_5,disposable_plates,Delhi,2024-09-23,4468.1
-co_5,disposable_plates,Delhi,2024-09-30,4300.0
-co_5,disposable_plates,Delhi,2024-10-07,4513.3
-co_5,disposable_plates,Delhi,2024-10-14,2434.0
-co_5,disposable_plates,Delhi,2024-10-21,2447.6
-co_5,disposable_plates,Delhi,2024-10-28,4111.3
-co_5,disposable_plates,Delhi,2024-11-04,4001.8
-co_5,disposable_plates,Delhi,2024-11-11,2280.8
-co_5,disposable_plates,Delhi,2024-11-18,2390.9
-co_5,disposable_plates,Delhi,2024-11-25,2314.2
-co_5,disposable_plates,Delhi,2024-12-02,2631.6
-co_5,disposable_plates,Delhi,2024-12-09,2549.9
-co_5,disposable_plates,Delhi,2024-12-16,2608.7
-co_5,disposable_plates,Delhi,2024-12-23,2639.8
-co_5,disposable_plates,Delhi,2024-12-30,2694.8
-co_5,disposable_plates,Delhi,2025-01-06,2646.1
-co_5,disposable_plates,Delhi,2025-01-13,2468.7
-co_5,disposable_plates,Delhi,2025-01-20,2841.1
-co_5,disposable_plates,Delhi,2025-01-27,2849.7
-co_5,disposable_plates,Delhi,2025-02-03,2769.2
-co_5,disposable_plates,Delhi,2025-02-10,2808.5
-co_5,disposable_plates,Delhi,2025-02-17,2886.9
-co_5,disposable_plates,Delhi,2025-02-24,2637.8
-co_5,disposable_plates,Delhi,2025-03-03,2959.0
-co_5,disposable_plates,Delhi,2025-03-10,2750.4
-co_5,disposable_plates,Delhi,2025-03-17,2677.8
-co_5,disposable_plates,Delhi,2025-03-24,2771.1
-co_5,disposable_plates,Delhi,2025-03-31,2986.7
-co_5,disposable_plates,Delhi,2025-04-07,2743.3
-co_5,disposable_plates,Delhi,2025-04-14,2983.7
-co_5,disposable_plates,Delhi,2025-04-21,3082.0
-co_5,disposable_plates,Delhi,2025-04-28,2848.2
-co_5,disposable_plates,Delhi,2025-05-05,2781.4
-co_5,disposable_plates,Delhi,2025-05-12,2805.7
-co_5,disposable_plates,Delhi,2025-05-19,2874.9
-co_5,disposable_plates,Delhi,2025-05-26,2886.1
-co_5,disposable_plates,Delhi,2025-06-02,2792.1
-co_5,disposable_plates,Delhi,2025-06-09,2773.9
-co_5,disposable_plates,Delhi,2025-06-16,2500.5
-co_5,disposable_plates,Delhi,2025-06-23,2501.1
-co_5,disposable_plates,Delhi,2025-06-30,2516.0
-co_5,disposable_plates,Delhi,2025-07-07,2688.2
-co_5,disposable_plates,Delhi,2025-07-14,2476.4
-co_5,disposable_plates,Delhi,2025-07-21,2553.6
-co_5,disposable_plates,Delhi,2025-07-28,2302.6
-co_5,disposable_plates,Delhi,2025-08-04,2296.7
-co_5,disposable_plates,Delhi,2025-08-11,2354.9
-co_5,disposable_plates,Delhi,2025-08-18,2489.7
-co_5,disposable_plates,Delhi,2025-08-25,2477.5
-co_5,disposable_plates,Delhi,2025-09-01,2454.3
-co_5,disposable_plates,Delhi,2025-09-08,2294.8
-co_5,disposable_plates,Delhi,2025-09-15,2371.1
-co_5,disposable_plates,Delhi,2025-09-22,4222.4
-co_5,disposable_plates,Delhi,2025-09-29,4220.1
-co_5,disposable_plates,Delhi,2025-10-06,3987.2
-co_5,disposable_plates,Delhi,2025-10-13,2513.7
-co_5,disposable_plates,Delhi,2025-10-20,2260.0
-co_5,disposable_plates,Delhi,2025-10-27,4625.7
-co_5,disposable_plates,Delhi,2025-11-03,4628.4
-co_5,disposable_plates,Delhi,2025-11-10,2236.0
-co_5,disposable_plates,Delhi,2025-11-17,2429.4
-co_5,disposable_plates,Delhi,2025-11-24,2596.8
-co_5,disposable_plates,Delhi,2025-12-01,2684.4
-co_5,disposable_plates,Delhi,2025-12-08,2505.8
-co_5,disposable_plates,Delhi,2025-12-15,2461.8
-co_5,disposable_plates,Delhi,2025-12-22,2467.4
+co_1,disposable_plates,Gujarat,2024-10-17,2499.8
+co_1,disposable_plates,Gujarat,2024-10-24,2744.3
+co_1,disposable_plates,Gujarat,2024-10-31,4546.0
+co_1,disposable_plates,Gujarat,2024-11-07,4963.1
+co_1,disposable_plates,Gujarat,2024-11-14,2711.2
+co_1,disposable_plates,Gujarat,2024-11-21,2600.2
+co_1,disposable_plates,Gujarat,2024-11-28,2826.6
+co_1,disposable_plates,Gujarat,2024-12-05,2635.3
+co_1,disposable_plates,Gujarat,2024-12-12,2835.1
+co_1,disposable_plates,Gujarat,2024-12-19,2683.7
+co_1,disposable_plates,Gujarat,2024-12-26,2705.6
+co_1,disposable_plates,Gujarat,2025-01-02,2869.7
+co_1,disposable_plates,Gujarat,2025-01-09,3062.7
+co_1,disposable_plates,Gujarat,2025-01-16,2737.1
+co_1,disposable_plates,Gujarat,2025-01-23,2781.6
+co_1,disposable_plates,Gujarat,2025-01-30,2964.0
+co_1,disposable_plates,Gujarat,2025-02-06,3102.6
+co_1,disposable_plates,Gujarat,2025-02-13,2917.7
+co_1,disposable_plates,Gujarat,2025-02-20,2818.2
+co_1,disposable_plates,Gujarat,2025-02-27,3062.7
+co_1,disposable_plates,Gujarat,2025-03-06,2618.4
+co_1,disposable_plates,Gujarat,2025-03-13,2958.6
+co_1,disposable_plates,Gujarat,2025-03-20,2677.4
+co_1,disposable_plates,Gujarat,2025-03-27,2585.5
+co_1,disposable_plates,Gujarat,2025-04-03,2545.2
+co_1,disposable_plates,Gujarat,2025-04-10,2597.5
+co_1,disposable_plates,Gujarat,2025-04-17,2781.6
+co_1,disposable_plates,Gujarat,2025-04-24,2482.1
+co_1,disposable_plates,Gujarat,2025-05-01,2618.0
+co_1,disposable_plates,Gujarat,2025-05-08,2610.5
+co_1,disposable_plates,Gujarat,2025-05-15,2473.1
+co_1,disposable_plates,Gujarat,2025-05-22,2516.3
+co_1,disposable_plates,Gujarat,2025-05-29,2299.2
+co_1,disposable_plates,Gujarat,2025-06-05,2276.9
+co_1,disposable_plates,Gujarat,2025-06-12,2315.5
+co_1,disposable_plates,Gujarat,2025-06-19,2482.9
+co_1,disposable_plates,Gujarat,2025-06-26,2372.3
+co_1,disposable_plates,Gujarat,2025-07-03,2319.5
+co_1,disposable_plates,Gujarat,2025-07-10,2417.5
+co_1,disposable_plates,Gujarat,2025-07-17,2365.0
+co_1,disposable_plates,Gujarat,2025-07-24,2308.4
+co_1,disposable_plates,Gujarat,2025-07-31,2503.2
+co_1,disposable_plates,Gujarat,2025-08-07,2476.5
+co_1,disposable_plates,Gujarat,2025-08-14,2314.4
+co_1,disposable_plates,Gujarat,2025-08-21,2458.7
+co_1,disposable_plates,Gujarat,2025-08-28,2459.4
+co_1,disposable_plates,Gujarat,2025-09-04,2620.5
+co_1,disposable_plates,Gujarat,2025-09-11,2588.9
+co_1,disposable_plates,Gujarat,2025-09-18,2439.0
+co_1,disposable_plates,Gujarat,2025-09-25,4950.0
+co_1,disposable_plates,Gujarat,2025-10-02,4367.5
+co_1,disposable_plates,Gujarat,2025-10-09,4646.7
+co_1,disposable_plates,Gujarat,2025-10-16,2756.6
+co_1,disposable_plates,Gujarat,2025-10-23,2530.4
+co_1,disposable_plates,Gujarat,2025-10-30,4871.2
+co_1,disposable_plates,Gujarat,2025-11-06,4571.0
+co_1,disposable_plates,Gujarat,2025-11-13,2845.3
+co_1,disposable_plates,Gujarat,2025-11-20,2916.5
+co_1,disposable_plates,Gujarat,2025-11-27,2856.2
+co_1,disposable_plates,Gujarat,2025-12-04,3016.8
+co_1,disposable_plates,Gujarat,2025-12-11,2780.2
+co_1,disposable_plates,Gujarat,2025-12-18,2972.2
+co_1,disposable_plates,Gujarat,2025-12-25,2938.9
+co_1,disposable_plates,Gujarat,2026-01-01,2941.9
+co_1,disposable_plates,Gujarat,2026-01-08,2890.1
+co_1,disposable_plates,Gujarat,2026-01-15,3070.9
+co_1,disposable_plates,Gujarat,2026-01-22,3117.6
+co_1,disposable_plates,Gujarat,2026-01-29,2892.7
+co_1,disposable_plates,Gujarat,2026-02-05,2971.3
+co_1,disposable_plates,Gujarat,2026-02-12,2679.5
+co_1,disposable_plates,Gujarat,2026-02-19,2957.9
+co_1,disposable_plates,Gujarat,2026-02-26,2912.8
+co_1,disposable_plates,Gujarat,2026-03-05,3046.0
+co_1,disposable_plates,Gujarat,2026-03-12,2942.2
+co_1,disposable_plates,Gujarat,2026-03-19,2675.2
+co_1,disposable_plates,Gujarat,2026-03-26,2691.5
+co_1,disposable_plates,Gujarat,2026-04-02,2784.2
+co_1,disposable_plates,Gujarat,2026-04-09,2474.9
+co_1,disposable_plates,Gujarat,2026-04-16,2631.4
+co_1,disposable_plates,Gujarat,2026-04-23,2476.8
+co_1,disposable_plates,Gujarat,2026-04-30,2426.0
+co_1,disposable_plates,Gujarat,2026-05-07,2373.6
+co_1,disposable_plates,Gujarat,2026-05-14,2633.0
+co_1,disposable_plates,Gujarat,2026-05-21,2349.2
+co_1,disposable_plates,Gujarat,2026-05-28,2372.3
+co_1,disposable_plates,Gujarat,2026-06-04,2406.7
+co_1,disposable_plates,Gujarat,2026-06-11,2574.2
+co_1,disposable_plates,Gujarat,2026-06-18,2251.3
+co_1,disposable_plates,Gujarat,2026-06-25,2380.6
+co_1,disposable_plates,Gujarat,2026-07-02,2409.5
+co_1,disposable_plates,Gujarat,2026-07-09,2531.1
+co_1,disposable_plates,Gujarat,2026-07-16,2504.6
+co_1,disposable_plates,Gujarat,2026-07-23,2523.7
+co_1,disposable_plates,Gujarat,2026-07-30,2305.8
+co_1,disposable_plates,Gujarat,2026-08-06,2367.6
+co_1,disposable_plates,Gujarat,2026-08-13,2358.7
+co_1,disposable_plates,Gujarat,2026-08-20,2579.1
+co_1,disposable_plates,Gujarat,2026-08-27,2628.9
+co_1,disposable_plates,Gujarat,2026-09-03,2334.0
+co_1,disposable_plates,Gujarat,2026-09-10,2367.9
+co_1,disposable_plates,Gujarat,2026-09-17,2416.3
+co_1,disposable_plates,Gujarat,2026-09-24,4400.7
+co_1,disposable_plates,Gujarat,2026-10-01,4640.6
+co_1,disposable_plates,Gujarat,2026-10-08,4775.5
+co_2,biofuel_pellets,Punjab,2024-10-17,2325.1
+co_2,biofuel_pellets,Punjab,2024-10-24,2522.8
+co_2,biofuel_pellets,Punjab,2024-10-31,4557.3
+co_2,biofuel_pellets,Punjab,2024-11-07,4757.1
+co_2,biofuel_pellets,Punjab,2024-11-14,2834.5
+co_2,biofuel_pellets,Punjab,2024-11-21,2750.3
+co_2,biofuel_pellets,Punjab,2024-11-28,2699.6
+co_2,biofuel_pellets,Punjab,2024-12-05,2765.6
+co_2,biofuel_pellets,Punjab,2024-12-12,2810.4
+co_2,biofuel_pellets,Punjab,2024-12-19,2552.9
+co_2,biofuel_pellets,Punjab,2024-12-26,2938.2
+co_2,biofuel_pellets,Punjab,2025-01-02,2894.8
+co_2,biofuel_pellets,Punjab,2025-01-09,2942.6
+co_2,biofuel_pellets,Punjab,2025-01-16,2910.4
+co_2,biofuel_pellets,Punjab,2025-01-23,2728.4
+co_2,biofuel_pellets,Punjab,2025-01-30,2725.9
+co_2,biofuel_pellets,Punjab,2025-02-06,2586.4
+co_2,biofuel_pellets,Punjab,2025-02-13,2808.2
+co_2,biofuel_pellets,Punjab,2025-02-20,2541.9
+co_2,biofuel_pellets,Punjab,2025-02-27,2526.6
+co_2,biofuel_pellets,Punjab,2025-03-06,2567.5
+co_2,biofuel_pellets,Punjab,2025-03-13,2524.7
+co_2,biofuel_pellets,Punjab,2025-03-20,2575.2
+co_2,biofuel_pellets,Punjab,2025-03-27,2427.8
+co_2,biofuel_pellets,Punjab,2025-04-03,2379.2
+co_2,biofuel_pellets,Punjab,2025-04-10,2413.3
+co_2,biofuel_pellets,Punjab,2025-04-17,2364.5
+co_2,biofuel_pellets,Punjab,2025-04-24,2440.6
+co_2,biofuel_pellets,Punjab,2025-05-01,2277.9
+co_2,biofuel_pellets,Punjab,2025-05-08,2581.8
+co_2,biofuel_pellets,Punjab,2025-05-15,2452.1
+co_2,biofuel_pellets,Punjab,2025-05-22,2248.1
+co_2,biofuel_pellets,Punjab,2025-05-29,2264.6
+co_2,biofuel_pellets,Punjab,2025-06-05,2279.4
+co_2,biofuel_pellets,Punjab,2025-06-12,2267.3
+co_2,biofuel_pellets,Punjab,2025-06-19,2163.0
+co_2,biofuel_pellets,Punjab,2025-06-26,2417.2
+co_2,biofuel_pellets,Punjab,2025-07-03,2460.2
+co_2,biofuel_pellets,Punjab,2025-07-10,2262.4
+co_2,biofuel_pellets,Punjab,2025-07-17,2267.1
+co_2,biofuel_pellets,Punjab,2025-07-24,2124.1
+co_2,biofuel_pellets,Punjab,2025-07-31,2135.1
+co_2,biofuel_pellets,Punjab,2025-08-07,2231.7
+co_2,biofuel_pellets,Punjab,2025-08-14,2215.2
+co_2,biofuel_pellets,Punjab,2025-08-21,2439.6
+co_2,biofuel_pellets,Punjab,2025-08-28,2209.9
+co_2,biofuel_pellets,Punjab,2025-09-04,2178.1
+co_2,biofuel_pellets,Punjab,2025-09-11,2553.9
+co_2,biofuel_pellets,Punjab,2025-09-18,2419.0
+co_2,biofuel_pellets,Punjab,2025-09-25,4136.8
+co_2,biofuel_pellets,Punjab,2025-10-02,4467.7
+co_2,biofuel_pellets,Punjab,2025-10-09,4151.2
+co_2,biofuel_pellets,Punjab,2025-10-16,2536.9
+co_2,biofuel_pellets,Punjab,2025-10-23,2751.6
+co_2,biofuel_pellets,Punjab,2025-10-30,4925.3
+co_2,biofuel_pellets,Punjab,2025-11-06,4854.8
+co_2,biofuel_pellets,Punjab,2025-11-13,2541.8
+co_2,biofuel_pellets,Punjab,2025-11-20,2612.0
+co_2,biofuel_pellets,Punjab,2025-11-27,2549.5
+co_2,biofuel_pellets,Punjab,2025-12-04,2832.6
+co_2,biofuel_pellets,Punjab,2025-12-11,2747.6
+co_2,biofuel_pellets,Punjab,2025-12-18,2871.9
+co_2,biofuel_pellets,Punjab,2025-12-25,2686.4
+co_2,biofuel_pellets,Punjab,2026-01-01,2647.9
+co_2,biofuel_pellets,Punjab,2026-01-08,2914.6
+co_2,biofuel_pellets,Punjab,2026-01-15,2993.6
+co_2,biofuel_pellets,Punjab,2026-01-22,2932.8
+co_2,biofuel_pellets,Punjab,2026-01-29,2906.4
+co_2,biofuel_pellets,Punjab,2026-02-05,2902.3
+co_2,biofuel_pellets,Punjab,2026-02-12,2854.6
+co_2,biofuel_pellets,Punjab,2026-02-19,2613.8
+co_2,biofuel_pellets,Punjab,2026-02-26,2722.2
+co_2,biofuel_pellets,Punjab,2026-03-05,2630.7
+co_2,biofuel_pellets,Punjab,2026-03-12,2467.8
+co_2,biofuel_pellets,Punjab,2026-03-19,2443.2
+co_2,biofuel_pellets,Punjab,2026-03-26,2522.8
+co_2,biofuel_pellets,Punjab,2026-04-02,2486.3
+co_2,biofuel_pellets,Punjab,2026-04-09,2634.7
+co_2,biofuel_pellets,Punjab,2026-04-16,2710.0
+co_2,biofuel_pellets,Punjab,2026-04-23,2474.0
+co_2,biofuel_pellets,Punjab,2026-04-30,2637.4
+co_2,biofuel_pellets,Punjab,2026-05-07,2626.2
+co_2,biofuel_pellets,Punjab,2026-05-14,2583.4
+co_2,biofuel_pellets,Punjab,2026-05-21,2330.4
+co_2,biofuel_pellets,Punjab,2026-05-28,2252.6
+co_2,biofuel_pellets,Punjab,2026-06-04,2234.3
+co_2,biofuel_pellets,Punjab,2026-06-11,2205.2
+co_2,biofuel_pellets,Punjab,2026-06-18,2193.0
+co_2,biofuel_pellets,Punjab,2026-06-25,2334.8
+co_2,biofuel_pellets,Punjab,2026-07-02,2426.3
+co_2,biofuel_pellets,Punjab,2026-07-09,2398.7
+co_2,biofuel_pellets,Punjab,2026-07-16,2265.5
+co_2,biofuel_pellets,Punjab,2026-07-23,2330.5
+co_2,biofuel_pellets,Punjab,2026-07-30,2389.6
+co_2,biofuel_pellets,Punjab,2026-08-06,2137.3
+co_2,biofuel_pellets,Punjab,2026-08-13,2361.0
+co_2,biofuel_pellets,Punjab,2026-08-20,2469.6
+co_2,biofuel_pellets,Punjab,2026-08-27,2442.0
+co_2,biofuel_pellets,Punjab,2026-09-03,2452.4
+co_2,biofuel_pellets,Punjab,2026-09-10,2373.7
+co_2,biofuel_pellets,Punjab,2026-09-17,2284.3
+co_2,biofuel_pellets,Punjab,2026-09-24,4587.5
+co_2,biofuel_pellets,Punjab,2026-10-01,4318.2
+co_2,biofuel_pellets,Punjab,2026-10-08,4707.3
+co_3,packaging_board,West Bengal,2024-10-17,3877.6
+co_3,packaging_board,West Bengal,2024-10-24,3927.9
+co_3,packaging_board,West Bengal,2024-10-31,7787.4
+co_3,packaging_board,West Bengal,2024-11-07,7614.0
+co_3,packaging_board,West Bengal,2024-11-14,3908.7
+co_3,packaging_board,West Bengal,2024-11-21,3918.6
+co_3,packaging_board,West Bengal,2024-11-28,3970.1
+co_3,packaging_board,West Bengal,2024-12-05,4513.0
+co_3,packaging_board,West Bengal,2024-12-12,4477.1
+co_3,packaging_board,West Bengal,2024-12-19,4049.5
+co_3,packaging_board,West Bengal,2024-12-26,4537.3
+co_3,packaging_board,West Bengal,2025-01-02,4658.7
+co_3,packaging_board,West Bengal,2025-01-09,4443.8
+co_3,packaging_board,West Bengal,2025-01-16,4233.8
+co_3,packaging_board,West Bengal,2025-01-23,4368.5
+co_3,packaging_board,West Bengal,2025-01-30,4070.8
+co_3,packaging_board,West Bengal,2025-02-06,3976.9
+co_3,packaging_board,West Bengal,2025-02-13,4615.9
+co_3,packaging_board,West Bengal,2025-02-20,4370.0
+co_3,packaging_board,West Bengal,2025-02-27,4256.5
+co_3,packaging_board,West Bengal,2025-03-06,4496.5
+co_3,packaging_board,West Bengal,2025-03-13,4123.2
+co_3,packaging_board,West Bengal,2025-03-20,4372.0
+co_3,packaging_board,West Bengal,2025-03-27,4296.2
+co_3,packaging_board,West Bengal,2025-04-03,3851.0
+co_3,packaging_board,West Bengal,2025-04-10,3832.4
+co_3,packaging_board,West Bengal,2025-04-17,3812.7
+co_3,packaging_board,West Bengal,2025-04-24,3734.1
+co_3,packaging_board,West Bengal,2025-05-01,3902.2
+co_3,packaging_board,West Bengal,2025-05-08,3657.0
+co_3,packaging_board,West Bengal,2025-05-15,3711.3
+co_3,packaging_board,West Bengal,2025-05-22,3499.8
+co_3,packaging_board,West Bengal,2025-05-29,3923.4
+co_3,packaging_board,West Bengal,2025-06-05,3562.8
+co_3,packaging_board,West Bengal,2025-06-12,3594.6
+co_3,packaging_board,West Bengal,2025-06-19,3642.1
+co_3,packaging_board,West Bengal,2025-06-26,3805.8
+co_3,packaging_board,West Bengal,2025-07-03,3515.2
+co_3,packaging_board,West Bengal,2025-07-10,3789.2
+co_3,packaging_board,West Bengal,2025-07-17,3549.9
+co_3,packaging_board,West Bengal,2025-07-24,3569.9
+co_3,packaging_board,West Bengal,2025-07-31,3573.8
+co_3,packaging_board,West Bengal,2025-08-07,3299.3
+co_3,packaging_board,West Bengal,2025-08-14,3559.7
+co_3,packaging_board,West Bengal,2025-08-21,3435.3
+co_3,packaging_board,West Bengal,2025-08-28,3358.6
+co_3,packaging_board,West Bengal,2025-09-04,3858.1
+co_3,packaging_board,West Bengal,2025-09-11,3524.3
+co_3,packaging_board,West Bengal,2025-09-18,3744.1
+co_3,packaging_board,West Bengal,2025-09-25,7092.9
+co_3,packaging_board,West Bengal,2025-10-02,6990.7
+co_3,packaging_board,West Bengal,2025-10-09,6817.2
+co_3,packaging_board,West Bengal,2025-10-16,3954.9
+co_3,packaging_board,West Bengal,2025-10-23,4026.2
+co_3,packaging_board,West Bengal,2025-10-30,7598.4
+co_3,packaging_board,West Bengal,2025-11-06,6886.5
+co_3,packaging_board,West Bengal,2025-11-13,4166.4
+co_3,packaging_board,West Bengal,2025-11-20,3999.6
+co_3,packaging_board,West Bengal,2025-11-27,4054.7
+co_3,packaging_board,West Bengal,2025-12-04,4423.1
+co_3,packaging_board,West Bengal,2025-12-11,4273.1
+co_3,packaging_board,West Bengal,2025-12-18,4334.9
+co_3,packaging_board,West Bengal,2025-12-25,4491.4
+co_3,packaging_board,West Bengal,2026-01-01,4611.7
+co_3,packaging_board,West Bengal,2026-01-08,4295.4
+co_3,packaging_board,West Bengal,2026-01-15,4415.7
+co_3,packaging_board,West Bengal,2026-01-22,4338.6
+co_3,packaging_board,West Bengal,2026-01-29,4334.6
+co_3,packaging_board,West Bengal,2026-02-05,4445.0
+co_3,packaging_board,West Bengal,2026-02-12,4259.7
+co_3,packaging_board,West Bengal,2026-02-19,4290.6
+co_3,packaging_board,West Bengal,2026-02-26,4223.6
+co_3,packaging_board,West Bengal,2026-03-05,4501.8
+co_3,packaging_board,West Bengal,2026-03-12,4300.2
+co_3,packaging_board,West Bengal,2026-03-19,4375.2
+co_3,packaging_board,West Bengal,2026-03-26,4372.0
+co_3,packaging_board,West Bengal,2026-04-02,3882.4
+co_3,packaging_board,West Bengal,2026-04-09,4028.8
+co_3,packaging_board,West Bengal,2026-04-16,4223.0
+co_3,packaging_board,West Bengal,2026-04-23,4107.7
+co_3,packaging_board,West Bengal,2026-04-30,3625.5
+co_3,packaging_board,West Bengal,2026-05-07,3573.2
+co_3,packaging_board,West Bengal,2026-05-14,3725.2
+co_3,packaging_board,West Bengal,2026-05-21,3464.9
+co_3,packaging_board,West Bengal,2026-05-28,3529.0
+co_3,packaging_board,West Bengal,2026-06-04,3399.0
+co_3,packaging_board,West Bengal,2026-06-11,3716.9
+co_3,packaging_board,West Bengal,2026-06-18,3757.4
+co_3,packaging_board,West Bengal,2026-06-25,3801.7
+co_3,packaging_board,West Bengal,2026-07-02,3363.6
+co_3,packaging_board,West Bengal,2026-07-09,3674.7
+co_3,packaging_board,West Bengal,2026-07-16,3640.0
+co_3,packaging_board,West Bengal,2026-07-23,3349.0
+co_3,packaging_board,West Bengal,2026-07-30,3778.5
+co_3,packaging_board,West Bengal,2026-08-06,3842.0
+co_3,packaging_board,West Bengal,2026-08-13,3432.9
+co_3,packaging_board,West Bengal,2026-08-20,3880.8
+co_3,packaging_board,West Bengal,2026-08-27,3588.8
+co_3,packaging_board,West Bengal,2026-09-03,3674.3
+co_3,packaging_board,West Bengal,2026-09-10,4010.8
+co_3,packaging_board,West Bengal,2026-09-17,3960.1
+co_3,packaging_board,West Bengal,2026-09-24,6475.4
+co_3,packaging_board,West Bengal,2026-10-01,6852.2
+co_3,packaging_board,West Bengal,2026-10-08,7029.9
+co_4,road_composite,Haryana,2024-10-17,2547.9
+co_4,road_composite,Haryana,2024-10-24,2631.8
+co_4,road_composite,Haryana,2024-10-31,5111.6
+co_4,road_composite,Haryana,2024-11-07,4608.0
+co_4,road_composite,Haryana,2024-11-14,2826.9
+co_4,road_composite,Haryana,2024-11-21,2803.4
+co_4,road_composite,Haryana,2024-11-28,2635.6
+co_4,road_composite,Haryana,2024-12-05,2801.1
+co_4,road_composite,Haryana,2024-12-12,2956.1
+co_4,road_composite,Haryana,2024-12-19,2921.1
+co_4,road_composite,Haryana,2024-12-26,2724.5
+co_4,road_composite,Haryana,2025-01-02,3166.3
+co_4,road_composite,Haryana,2025-01-09,3079.9
+co_4,road_composite,Haryana,2025-01-16,3168.4
+co_4,road_composite,Haryana,2025-01-23,2757.9
+co_4,road_composite,Haryana,2025-01-30,2828.1
+co_4,road_composite,Haryana,2025-02-06,2712.9
+co_4,road_composite,Haryana,2025-02-13,3045.5
+co_4,road_composite,Haryana,2025-02-20,2792.2
+co_4,road_composite,Haryana,2025-02-27,2708.1
+co_4,road_composite,Haryana,2025-03-06,2820.3
+co_4,road_composite,Haryana,2025-03-13,3016.7
+co_4,road_composite,Haryana,2025-03-20,2945.7
+co_4,road_composite,Haryana,2025-03-27,2666.1
+co_4,road_composite,Haryana,2025-04-03,2588.5
+co_4,road_composite,Haryana,2025-04-10,2892.3
+co_4,road_composite,Haryana,2025-04-17,2708.5
+co_4,road_composite,Haryana,2025-04-24,2730.8
+co_4,road_composite,Haryana,2025-05-01,2442.4
+co_4,road_composite,Haryana,2025-05-08,2400.4
+co_4,road_composite,Haryana,2025-05-15,2630.7
+co_4,road_composite,Haryana,2025-05-22,2495.9
+co_4,road_composite,Haryana,2025-05-29,2329.6
+co_4,road_composite,Haryana,2025-06-05,2651.5
+co_4,road_composite,Haryana,2025-06-12,2510.7
+co_4,road_composite,Haryana,2025-06-19,2558.9
+co_4,road_composite,Haryana,2025-06-26,2266.1
+co_4,road_composite,Haryana,2025-07-03,2556.0
+co_4,road_composite,Haryana,2025-07-10,2245.1
+co_4,road_composite,Haryana,2025-07-17,2550.3
+co_4,road_composite,Haryana,2025-07-24,2394.5
+co_4,road_composite,Haryana,2025-07-31,2356.0
+co_4,road_composite,Haryana,2025-08-07,2448.4
+co_4,road_composite,Haryana,2025-08-14,2607.7
+co_4,road_composite,Haryana,2025-08-21,2366.5
+co_4,road_composite,Haryana,2025-08-28,2330.8
+co_4,road_composite,Haryana,2025-09-04,2511.4
+co_4,road_composite,Haryana,2025-09-11,2420.4
+co_4,road_composite,Haryana,2025-09-18,2394.2
+co_4,road_composite,Haryana,2025-09-25,4398.0
+co_4,road_composite,Haryana,2025-10-02,4366.9
+co_4,road_composite,Haryana,2025-10-09,4535.4
+co_4,road_composite,Haryana,2025-10-16,2597.7
+co_4,road_composite,Haryana,2025-10-23,2625.9
+co_4,road_composite,Haryana,2025-10-30,5141.1
+co_4,road_composite,Haryana,2025-11-06,4824.0
+co_4,road_composite,Haryana,2025-11-13,2802.7
+co_4,road_composite,Haryana,2025-11-20,2684.5
+co_4,road_composite,Haryana,2025-11-27,2785.9
+co_4,road_composite,Haryana,2025-12-04,2656.8
+co_4,road_composite,Haryana,2025-12-11,2782.9
+co_4,road_composite,Haryana,2025-12-18,2689.3
+co_4,road_composite,Haryana,2025-12-25,3037.9
+co_4,road_composite,Haryana,2026-01-01,2962.3
+co_4,road_composite,Haryana,2026-01-08,2797.8
+co_4,road_composite,Haryana,2026-01-15,2934.2
+co_4,road_composite,Haryana,2026-01-22,3148.8
+co_4,road_composite,Haryana,2026-01-29,2753.2
+co_4,road_composite,Haryana,2026-02-05,3078.1
+co_4,road_composite,Haryana,2026-02-12,2883.7
+co_4,road_composite,Haryana,2026-02-19,2896.3
+co_4,road_composite,Haryana,2026-02-26,3032.8
+co_4,road_composite,Haryana,2026-03-05,2807.0
+co_4,road_composite,Haryana,2026-03-12,2833.4
+co_4,road_composite,Haryana,2026-03-19,2886.9
+co_4,road_composite,Haryana,2026-03-26,2987.3
+co_4,road_composite,Haryana,2026-04-02,2673.3
+co_4,road_composite,Haryana,2026-04-09,2854.6
+co_4,road_composite,Haryana,2026-04-16,2766.8
+co_4,road_composite,Haryana,2026-04-23,2703.5
+co_4,road_composite,Haryana,2026-04-30,2574.3
+co_4,road_composite,Haryana,2026-05-07,2520.3
+co_4,road_composite,Haryana,2026-05-14,2371.7
+co_4,road_composite,Haryana,2026-05-21,2376.5
+co_4,road_composite,Haryana,2026-05-28,2328.9
+co_4,road_composite,Haryana,2026-06-04,2573.3
+co_4,road_composite,Haryana,2026-06-11,2361.7
+co_4,road_composite,Haryana,2026-06-18,2309.6
+co_4,road_composite,Haryana,2026-06-25,2266.4
+co_4,road_composite,Haryana,2026-07-02,2550.2
+co_4,road_composite,Haryana,2026-07-09,2555.4
+co_4,road_composite,Haryana,2026-07-16,2476.2
+co_4,road_composite,Haryana,2026-07-23,2328.2
+co_4,road_composite,Haryana,2026-07-30,2318.5
+co_4,road_composite,Haryana,2026-08-06,2347.4
+co_4,road_composite,Haryana,2026-08-13,2425.2
+co_4,road_composite,Haryana,2026-08-20,2323.1
+co_4,road_composite,Haryana,2026-08-27,2456.3
+co_4,road_composite,Haryana,2026-09-03,2405.9
+co_4,road_composite,Haryana,2026-09-10,2712.7
+co_4,road_composite,Haryana,2026-09-17,2746.9
+co_4,road_composite,Haryana,2026-09-24,4684.9
+co_4,road_composite,Haryana,2026-10-01,4513.0
+co_4,road_composite,Haryana,2026-10-08,5117.6
+co_5,disposable_plates,Delhi,2024-10-17,2559.0
+co_5,disposable_plates,Delhi,2024-10-24,2439.1
+co_5,disposable_plates,Delhi,2024-10-31,4735.8
+co_5,disposable_plates,Delhi,2024-11-07,4861.7
+co_5,disposable_plates,Delhi,2024-11-14,2742.0
+co_5,disposable_plates,Delhi,2024-11-21,2635.5
+co_5,disposable_plates,Delhi,2024-11-28,2794.9
+co_5,disposable_plates,Delhi,2024-12-05,2592.2
+co_5,disposable_plates,Delhi,2024-12-12,2727.7
+co_5,disposable_plates,Delhi,2024-12-19,2663.9
+co_5,disposable_plates,Delhi,2024-12-26,2817.9
+co_5,disposable_plates,Delhi,2025-01-02,2662.7
+co_5,disposable_plates,Delhi,2025-01-09,2659.1
+co_5,disposable_plates,Delhi,2025-01-16,2790.8
+co_5,disposable_plates,Delhi,2025-01-23,2756.0
+co_5,disposable_plates,Delhi,2025-01-30,2912.7
+co_5,disposable_plates,Delhi,2025-02-06,2877.4
+co_5,disposable_plates,Delhi,2025-02-13,2965.3
+co_5,disposable_plates,Delhi,2025-02-20,2906.1
+co_5,disposable_plates,Delhi,2025-02-27,2912.4
+co_5,disposable_plates,Delhi,2025-03-06,2962.2
+co_5,disposable_plates,Delhi,2025-03-13,2718.9
+co_5,disposable_plates,Delhi,2025-03-20,2664.6
+co_5,disposable_plates,Delhi,2025-03-27,2922.3
+co_5,disposable_plates,Delhi,2025-04-03,2531.4
+co_5,disposable_plates,Delhi,2025-04-10,2745.7
+co_5,disposable_plates,Delhi,2025-04-17,2679.1
+co_5,disposable_plates,Delhi,2025-04-24,2398.7
+co_5,disposable_plates,Delhi,2025-05-01,2693.6
+co_5,disposable_plates,Delhi,2025-05-08,2684.6
+co_5,disposable_plates,Delhi,2025-05-15,2548.3
+co_5,disposable_plates,Delhi,2025-05-22,2562.7
+co_5,disposable_plates,Delhi,2025-05-29,2567.6
+co_5,disposable_plates,Delhi,2025-06-05,2283.2
+co_5,disposable_plates,Delhi,2025-06-12,2412.7
+co_5,disposable_plates,Delhi,2025-06-19,2388.9
+co_5,disposable_plates,Delhi,2025-06-26,2501.4
+co_5,disposable_plates,Delhi,2025-07-03,2480.1
+co_5,disposable_plates,Delhi,2025-07-10,2482.3
+co_5,disposable_plates,Delhi,2025-07-17,2388.9
+co_5,disposable_plates,Delhi,2025-07-24,2507.4
+co_5,disposable_plates,Delhi,2025-07-31,2434.0
+co_5,disposable_plates,Delhi,2025-08-07,2447.6
+co_5,disposable_plates,Delhi,2025-08-14,2284.0
+co_5,disposable_plates,Delhi,2025-08-21,2223.2
+co_5,disposable_plates,Delhi,2025-08-28,2280.8
+co_5,disposable_plates,Delhi,2025-09-04,2390.9
+co_5,disposable_plates,Delhi,2025-09-11,2314.2
+co_5,disposable_plates,Delhi,2025-09-18,2631.6
+co_5,disposable_plates,Delhi,2025-09-25,4589.8
+co_5,disposable_plates,Delhi,2025-10-02,4695.6
+co_5,disposable_plates,Delhi,2025-10-09,4751.6
+co_5,disposable_plates,Delhi,2025-10-16,2694.8
+co_5,disposable_plates,Delhi,2025-10-23,2646.1
+co_5,disposable_plates,Delhi,2025-10-30,4443.6
+co_5,disposable_plates,Delhi,2025-11-06,5114.1
+co_5,disposable_plates,Delhi,2025-11-13,2849.7
+co_5,disposable_plates,Delhi,2025-11-20,2769.2
+co_5,disposable_plates,Delhi,2025-11-27,2808.5
+co_5,disposable_plates,Delhi,2025-12-04,2886.9
+co_5,disposable_plates,Delhi,2025-12-11,2637.8
+co_5,disposable_plates,Delhi,2025-12-18,2959.0
+co_5,disposable_plates,Delhi,2025-12-25,2750.4
+co_5,disposable_plates,Delhi,2026-01-01,2677.8
+co_5,disposable_plates,Delhi,2026-01-08,2771.1
+co_5,disposable_plates,Delhi,2026-01-15,2986.7
+co_5,disposable_plates,Delhi,2026-01-22,2743.3
+co_5,disposable_plates,Delhi,2026-01-29,2983.7
+co_5,disposable_plates,Delhi,2026-02-05,3082.0
+co_5,disposable_plates,Delhi,2026-02-12,2848.2
+co_5,disposable_plates,Delhi,2026-02-19,2781.4
+co_5,disposable_plates,Delhi,2026-02-26,2805.7
+co_5,disposable_plates,Delhi,2026-03-05,2874.9
+co_5,disposable_plates,Delhi,2026-03-12,2886.1
+co_5,disposable_plates,Delhi,2026-03-19,2792.1
+co_5,disposable_plates,Delhi,2026-03-26,2773.9
+co_5,disposable_plates,Delhi,2026-04-02,2500.5
+co_5,disposable_plates,Delhi,2026-04-09,2501.1
+co_5,disposable_plates,Delhi,2026-04-16,2516.0
+co_5,disposable_plates,Delhi,2026-04-23,2688.2
+co_5,disposable_plates,Delhi,2026-04-30,2476.4
+co_5,disposable_plates,Delhi,2026-05-07,2553.6
+co_5,disposable_plates,Delhi,2026-05-14,2302.6
+co_5,disposable_plates,Delhi,2026-05-21,2296.7
+co_5,disposable_plates,Delhi,2026-05-28,2354.9
+co_5,disposable_plates,Delhi,2026-06-04,2489.7
+co_5,disposable_plates,Delhi,2026-06-11,2477.5
+co_5,disposable_plates,Delhi,2026-06-18,2454.3
+co_5,disposable_plates,Delhi,2026-06-25,2294.8
+co_5,disposable_plates,Delhi,2026-07-02,2371.1
+co_5,disposable_plates,Delhi,2026-07-09,2345.8
+co_5,disposable_plates,Delhi,2026-07-16,2344.5
+co_5,disposable_plates,Delhi,2026-07-23,2215.1
+co_5,disposable_plates,Delhi,2026-07-30,2513.7
+co_5,disposable_plates,Delhi,2026-08-06,2260.0
+co_5,disposable_plates,Delhi,2026-08-13,2569.8
+co_5,disposable_plates,Delhi,2026-08-20,2571.3
+co_5,disposable_plates,Delhi,2026-08-27,2236.0
+co_5,disposable_plates,Delhi,2026-09-03,2429.4
+co_5,disposable_plates,Delhi,2026-09-10,2596.8
+co_5,disposable_plates,Delhi,2026-09-17,2684.4
+co_5,disposable_plates,Delhi,2026-09-24,4510.4
+co_5,disposable_plates,Delhi,2026-10-01,4431.2
+co_5,disposable_plates,Delhi,2026-10-08,4441.3
