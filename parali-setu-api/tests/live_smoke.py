@@ -84,6 +84,54 @@ def check_voice_round_trip():
         db.collection(coll).document(doc_id).delete()
 
 
+def check_voice_with_photo():
+    """Full farmer flow: voice + the optional photo quality read, through
+    the real /listings/voice endpoint, using the real CC-licensed
+    reference photo in seed/reference_photos/ (see ATTRIBUTION.md)."""
+    tts_client = texttospeech.TextToSpeechClient()
+    text = "ਮੇਰੇ ਕੋਲ ਬਾਰਾਂ ਕੁਇੰਟਲ ਪਰਾਲੀ ਹੈ ਸੰਗਰੂਰ ਵਿੱਚ"
+    synth_input = texttospeech.SynthesisInput(text=text)
+    voice = texttospeech.VoiceSelectionParams(language_code="pa-IN", name="pa-IN-Chirp3-HD-Achernar")
+    audio_config = texttospeech.AudioConfig(
+        audio_encoding=texttospeech.AudioEncoding.LINEAR16, sample_rate_hertz=16000
+    )
+    audio_content = tts_client.synthesize_speech(
+        input=synth_input, voice=voice, audio_config=audio_config
+    ).audio_content
+
+    photo_path = Path(__file__).resolve().parent.parent / "seed" / "reference_photos" / "paddy_stubble_coorg_dry_example.jpg"
+    photo_bytes = photo_path.read_bytes()
+
+    client = TestClient(main.app)
+    db = get_firestore_client()
+    db.collection("companies").document("photo_smoke_co").set({"id": "photo_smoke_co", "name": "Photo Smoke Co"})
+    demand_resp = client.post("/companies/photo_smoke_co/demand", json={
+        "product": "biofuel_pellets", "crop_type": "rice_stubble",
+        "quantity_needed_kg": 2000, "price_offer_per_kg": 8.0,
+        "accepted_quality_grades": ["unknown", "dry", "wet", "mixed"],
+    })
+    demand_id = demand_resp.json()["id"]
+
+    resp = client.post(
+        "/listings/voice",
+        params={"farmer_id": "photo_smoke_farmer", "language": "Punjabi"},
+        files={
+            "audio": ("listing.wav", audio_content, "audio/wav"),
+            "photo": ("stubble.jpg", photo_bytes, "image/jpeg"),
+        },
+    )
+    assert resp.status_code == 200, resp.text
+    body = resp.json()
+    assert body["listing"]["quality_grade"] in ("dry", "wet", "mixed"), (
+        f"expected the real photo read to produce a grade, got {body['listing']['quality_grade']}"
+    )
+    print("photo quality read:", body["listing"]["quality_grade"], "--", body.get("quality_note"))
+
+    for coll, doc_id in [("companies", "photo_smoke_co"), ("demand", demand_id),
+                          ("listings", body["listing"]["id"]), ("matches", body["matches"][0]["id"])]:
+        db.collection(coll).document(doc_id).delete()
+
+
 def run():
     client = TestClient(main.app)
     db = get_firestore_client()
@@ -133,6 +181,7 @@ def run():
 
     check_no_date_fabrication()
     check_voice_round_trip()
+    check_voice_with_photo()
 
     print("\nALL LIVE CHECKS PASSED")
 

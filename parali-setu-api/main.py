@@ -5,9 +5,11 @@
   OR-Tools (solver.py)    ->  every price/quantity decision
   Firestore (firestore_store.py) -> the only state, read live by both apps
 
-No Speech-to-Text/Text-to-Speech yet (Section 15.1 Phase 2 continues
-with those next) -- this is the text-first path: a farmer's typed
-message in, a match out, same pipeline voice will feed into later.
+Voice (Speech-to-Text/Text-to-Speech) and the optional multimodal photo
+quality read are both live on /listings/voice. The plain /listings
+(JSON) endpoint is the lighter-weight text-only path and doesn't accept
+a photo -- bundling it there was a deliberate scope call, not an
+oversight, since the photo read is explicitly optional (Section 8.1.3).
 """
 from __future__ import annotations
 
@@ -18,7 +20,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 import firestore_store as store
-from extraction import explain_match, extract_listing, parse_negotiation_price
+from extraction import explain_match, extract_listing, parse_negotiation_price, read_stubble_quality
 from gemini_client import get_gemini_client
 from solver import Demand, Listing, apply_negotiation, solve_matches
 from speech import synthesize_speech, transcribe_audio
@@ -74,12 +76,18 @@ def health():
     return {"status": "ok"}
 
 
-def _create_listing_from_text(farmer_id: str, raw_text: str, language: str) -> dict:
+def _create_listing_from_text(farmer_id: str, raw_text: str, language: str, quality_grade: str = "unknown") -> dict:
     """PRD 8.1 steps 2-6: extract -> write -> solve live -> explain.
     Shared by the text endpoint and the voice endpoint below -- voice
     only adds a transcription step in front of this, never a second
     implementation of it (PRD 8.1: 'Gemini extracts... whether spoken
-    or typed' is one path, not two)."""
+    or typed' is one path, not two).
+
+    `quality_grade` comes from the optional photo read (PRD 8.1.3),
+    determined by the caller before this runs -- this function never
+    calls Gemini's vision path itself, it only records whatever grade
+    (or "unknown") it's handed.
+    """
     db = store.get_firestore_client()
     client = get_gemini_client()
 
@@ -88,6 +96,7 @@ def _create_listing_from_text(farmer_id: str, raw_text: str, language: str) -> d
         raise HTTPException(status_code=503, detail="Could not understand the listing right now -- please try again")
     if extracted.get("quantity_kg") is None or extracted.get("crop_type") is None:
         raise HTTPException(status_code=422, detail="Missing quantity or crop type -- please confirm these details")
+    extracted["quality_grade"] = quality_grade
 
     listing_doc = store.save_listing(db, farmer_id, extracted, language)
 
@@ -133,9 +142,20 @@ def create_listing(req: ListingRequest):
 
 
 @app.post("/listings/voice")
-async def create_listing_voice(farmer_id: str, language: str, audio: UploadFile = File(...)):
-    """PRD 8.1.1-2: spoken listing in. 16kHz LINEAR16 mono, matching the
-    sample rate confirmed live for both hi-IN and pa-IN (speech.py)."""
+async def create_listing_voice(
+    farmer_id: str,
+    language: str,
+    audio: UploadFile = File(...),
+    photo: UploadFile | None = File(None),
+):
+    """PRD 8.1.1-3: spoken listing in, 16kHz LINEAR16 mono (matching the
+    sample rate confirmed live for both hi-IN and pa-IN -- speech.py),
+    plus an optional stubble-pile photo (8.1.3). A failed or skipped
+    photo read falls back to quality_grade="unknown", never a guess --
+    this mirrors the solver's own "unknown passes any quality_spec"
+    eligibility rule (solver.py), so skipping the photo never excludes
+    a farmer from matching, it just means quality isn't a filter yet.
+    """
     audio_bytes = await audio.read()
     transcript = transcribe_audio(audio_bytes, language)
     if transcript is None:
@@ -143,8 +163,20 @@ async def create_listing_voice(farmer_id: str, language: str, audio: UploadFile 
             status_code=422,
             detail="Could not transcribe that -- please try again or type the listing instead",
         )
-    result = _create_listing_from_text(farmer_id, transcript, language)
+
+    quality_grade = "unknown"
+    quality_note = None
+    if photo is not None:
+        photo_bytes = await photo.read()
+        client = get_gemini_client()
+        quality_result = read_stubble_quality(client, photo_bytes, mime_type=photo.content_type or "image/jpeg")
+        if quality_result and quality_result.get("quality_grade"):
+            quality_grade = quality_result["quality_grade"]
+            quality_note = quality_result.get("note")
+
+    result = _create_listing_from_text(farmer_id, transcript, language, quality_grade=quality_grade)
     result["transcript"] = transcript
+    result["quality_note"] = quality_note
     return result
 
 

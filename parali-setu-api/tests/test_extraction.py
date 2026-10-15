@@ -13,7 +13,7 @@ from unittest.mock import MagicMock
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from extraction import explain_match, extract_listing, parse_negotiation_price  # noqa: E402
+from extraction import explain_match, extract_listing, parse_negotiation_price, read_stubble_quality  # noqa: E402
 
 
 def make_fake_client(response_text):
@@ -68,6 +68,38 @@ def test_parse_negotiation_price_non_price_message():
     client = make_fake_client(json.dumps({"requested_price_per_kg": None, "is_price_request": False}))
     result = parse_negotiation_price(client, "Can you pick up on Thursday instead?", current_price_per_kg=8.0)
     assert result["is_price_request"] is False
+
+
+def test_read_stubble_quality_parses_valid_grade():
+    client = make_fake_client(json.dumps({"quality_grade": "dry", "note": "pale, no moisture"}))
+    result = read_stubble_quality(client, b"fake-image-bytes", mime_type="image/jpeg")
+    assert result["quality_grade"] == "dry"
+
+
+def test_read_stubble_quality_rejects_invalid_grade_rather_than_trust_it():
+    client = make_fake_client(json.dumps({"quality_grade": "excellent", "note": "..."}))  # not a real grade
+    result = read_stubble_quality(client, b"fake-image-bytes")
+    assert result["quality_grade"] is None
+
+
+def test_read_stubble_quality_null_grade_passes_through():
+    """Confirmed live 2026-10-15: Gemini correctly returns a null grade
+    for an unusable/off-subject photo rather than guessing one -- this
+    test locks in that None must survive untouched, not get coerced."""
+    client = make_fake_client(json.dumps({"quality_grade": None, "note": "not a usable photo"}))
+    result = read_stubble_quality(client, b"fake-image-bytes")
+    assert result["quality_grade"] is None
+    assert result["note"] == "not a usable photo"
+
+
+def test_read_stubble_quality_returns_none_on_gemini_unavailable():
+    client = MagicMock()
+    client.models.generate_content.side_effect = Exception("unreachable")
+    try:
+        read_stubble_quality(client, b"fake-image-bytes")
+        assert False, "expected the underlying exception to propagate from call_gemini"
+    except Exception:
+        pass
 
 
 def test_explain_match_never_asked_to_change_the_numbers():

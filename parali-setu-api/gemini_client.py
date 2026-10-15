@@ -28,11 +28,16 @@ def get_gemini_client() -> genai.Client:
     return genai.Client(vertexai=True, project=PROJECT_ID, location=VERTEX_LOCATION)
 
 
-def call_gemini(client: genai.Client, prompt: str, json_mode: bool = False) -> str | None:
+def call_gemini(client: genai.Client, contents, json_mode: bool = False) -> str | None:
     """Three retries on transient server errors, then gives up and returns
     None -- callers must handle None explicitly (show a plain error, never
     fabricate a result). PRD Section 13: 'if a Gemini call fails, show a
     plain error -- never let the model guess a price or quantity.'
+
+    `contents` is whatever the SDK accepts: a plain string for the
+    text-only jobs (extraction, negotiation parsing, narration), or a
+    list of Parts (text + image) for the multimodal quality read -- the
+    retry/quota logic doesn't care which.
 
     Mirrors aidatlas-api/main.py's call_gemini exactly, including the
     QUOTA_EXHAUSTED short-circuit -- once a 429 is seen, every later call
@@ -48,7 +53,7 @@ def call_gemini(client: genai.Client, prompt: str, json_mode: bool = False) -> s
     for attempt in range(3):
         try:
             response = client.models.generate_content(
-                model=GEMINI_MODEL, contents=prompt, config=config
+                model=GEMINI_MODEL, contents=contents, config=config
             )
             return response.text
         except genai_errors.ServerError:

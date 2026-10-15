@@ -12,10 +12,12 @@ import json
 from datetime import date
 
 from google import genai
+from google.genai import types
 
 from gemini_client import call_gemini
 
 VALID_CROP_TYPES = ("rice_stubble", "wheat_stubble")
+VALID_QUALITY_GRADES = ("dry", "wet", "mixed")
 
 
 def extract_listing(client: genai.Client, raw_text: str, language: str, today: date | None = None) -> dict | None:
@@ -65,6 +67,46 @@ Farmer's message: "{raw_text}"
 
     if parsed.get("crop_type") not in VALID_CROP_TYPES:
         parsed["crop_type"] = None
+    return parsed
+
+
+def read_stubble_quality(client: genai.Client, image_bytes: bytes, mime_type: str = "image/jpeg") -> dict | None:
+    """PRD 8.1.3 -- optional multimodal perception signal, never a price
+    input. Returns {"quality_grade": "dry"|"wet"|"mixed", "note": str} on
+    success, or None if Gemini is unavailable -- callers must fall back
+    to quality_grade="unknown" (self-reported crop_type only), never guess
+    a grade. This is the one function in this file that takes an image
+    instead of text, but the contract is identical: Gemini perceives,
+    it never decides a number.
+    """
+    prompt_part = types.Part.from_text(text="""Look at this photo of harvested crop
+residue (stubble) -- this could be cut stalks still standing/lying in the
+field after harvest, or residue already gathered into a pile; either is a
+valid photo. Respond with ONLY a JSON object:
+
+{
+  "quality_grade": <one of "dry", "wet", or "mixed" (visibly mixed with other
+    debris/soil) -- your best visual read>,
+  "note": <one short phrase explaining the read, e.g. "pale gold, no visible moisture">
+}
+
+If the image genuinely isn't crop residue/stubble at all (a different subject
+entirely), or the photo is too unclear to make any reasonable call, respond
+with {"quality_grade": null, "note": "not a usable photo"} instead of
+guessing.
+""")
+    image_part = types.Part.from_bytes(data=image_bytes, mime_type=mime_type)
+
+    text = call_gemini(client, [prompt_part, image_part], json_mode=True)
+    if text is None:
+        return None
+    try:
+        parsed = json.loads(text)
+    except json.JSONDecodeError:
+        return None
+
+    if parsed.get("quality_grade") not in VALID_QUALITY_GRADES:
+        parsed["quality_grade"] = None
     return parsed
 
 
