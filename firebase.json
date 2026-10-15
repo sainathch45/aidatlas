@@ -1,12 +1,26 @@
 {
-  "hosting": {
-    "public": "frontend",
-    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
-    "headers": [
-      {
-        "source": "**/*.@(js|css)",
-        "headers": [{ "key": "Cache-Control", "value": "no-cache" }]
-      }
-    ]
-  }
+  "hosting": [
+    {
+      "target": "aidatlas",
+      "public": "frontend",
+      "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+      "headers": [
+        {
+          "source": "**/*.@(js|css)",
+          "headers": [{ "key": "Cache-Control", "value": "no-cache" }]
+        }
+      ]
+    },
+    {
+      "target": "parali-setu",
+      "public": "parali-setu-frontend",
+      "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+      "headers": [
+        {
+          "source": "**/*.@(js|css)",
+          "headers": [{ "key": "Cache-Control", "value": "no-cache" }]
+        }
+      ]
+    }
+  ]
 }

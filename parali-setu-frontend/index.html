@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Parali Setu — Farmer</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="page">
+
+  <header class="top">
+    <h1>🌾 Parali Setu</h1>
+    <nav>
+      <a href="index.html" class="active">Farmer</a>
+      <a href="company.html">Company</a>
+    </nav>
+  </header>
+
+  <div class="card">
+    <h2>ਆਪਣੀ ਪਰਾਲੀ ਦੀ ਸੂਚੀ ਦਿਓ / अपनी पराली की लिस्टिंग दें</h2>
+    <div class="lang-toggle">
+      <button id="lang-hi" class="active">Hindi</button>
+      <button id="lang-pa">Punjabi</button>
+    </div>
+    <p class="hint" style="margin-top:.8rem;">Type your listing, or press the mic and speak — quantity, crop, village, and when it's ready to pick up. A photo is optional.</p>
+
+    <div class="row" style="margin-top:.8rem;">
+      <textarea id="text-input" rows="2" placeholder="e.g. 10 quintal rice stubble in Sangrur, ready by 25 October"></textarea>
+    </div>
+
+    <div class="row" style="align-items:center;margin-top:.6rem;">
+      <button id="record-btn" class="record" aria-label="Record your listing by voice">🎤</button>
+      <span id="record-status" class="hint" aria-live="polite">Tap to record</span>
+      <label class="file-pill" style="cursor:pointer;">
+        📷 <span id="photo-label">Add photo (optional)</span>
+        <input type="file" id="photo-input" accept="image/*" style="display:none;" aria-label="Attach a photo of the stubble pile">
+      </label>
+    </div>
+
+    <div class="row" style="margin-top:.8rem;">
+      <button id="submit-text" class="primary">Send listing</button>
+    </div>
+
+    <p id="status-line" class="hint" style="display:none;"></p>
+  </div>
+
+  <div id="result" style="display:none;" class="card">
+    <h2>Result</h2>
+    <div id="transcript-block" style="display:none;" class="transcript"></div>
+    <div id="error-block" style="display:none;" class="error"></div>
+    <div id="match-block" style="display:none;" class="match-card">
+      <div class="match-row"><span class="label">Quantity</span><span class="value" id="m-qty"></span></div>
+      <div class="match-row"><span class="label">Crop</span><span class="value" id="m-crop"></span></div>
+      <div class="match-row"><span class="label">Quality read</span><span class="value" id="m-quality"></span></div>
+      <div class="match-row"><span class="label">Buyer</span><span class="value" id="m-buyer"></span></div>
+      <div class="match-row"><span class="label">Price</span><span class="value" id="m-price"></span></div>
+      <div class="match-row"><span class="label">Pickup by</span><span class="value" id="m-pickup"></span></div>
+      <p class="explanation" id="m-explanation"></p>
+      <audio id="m-audio" controls style="display:none;"></audio>
+
+      <div class="row" style="margin-top:.6rem;">
+        <input type="text" id="negotiate-input" placeholder="e.g. can we get 9.50 per kg instead?">
+        <button id="negotiate-btn" class="secondary">Ask</button>
+      </div>
+      <p id="negotiate-result" class="hint"></p>
+    </div>
+  </div>
+
+</div>
+
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

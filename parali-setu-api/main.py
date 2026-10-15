@@ -113,6 +113,12 @@ def _create_listing_from_text(farmer_id: str, raw_text: str, language: str, qual
         m = saved_matches[0]
         company_doc = db.collection("companies").document(m["company_id"]).get()
         company_name = company_doc.to_dict()["name"] if company_doc.exists else m["company_id"]
+        # Enrich every returned match with the display name -- found live
+        # 2026-10-15: the frontend was showing the raw company_id ("co_3")
+        # to the farmer because nothing in the response carried the name.
+        for match in saved_matches:
+            match_company_doc = db.collection("companies").document(match["company_id"]).get()
+            match["company_name"] = match_company_doc.to_dict()["name"] if match_company_doc.exists else match["company_id"]
         explanation = explain_match(
             client,
             {
@@ -157,7 +163,15 @@ async def create_listing_voice(
     a farmer from matching, it just means quality isn't a filter yet.
     """
     audio_bytes = await audio.read()
-    transcript = transcribe_audio(audio_bytes, language)
+    # Real browsers send audio/webm(;codecs=opus); the live smoke tests'
+    # synthetic WAV fixtures send audio/wav -- detect from content_type
+    # rather than hardcoding one format for both (speech.py, verified
+    # live for both 2026-10-15).
+    if audio.content_type and "wav" in audio.content_type:
+        audio_format, sample_rate = "linear16", 16000
+    else:
+        audio_format, sample_rate = "webm_opus", 48000
+    transcript = transcribe_audio(audio_bytes, language, sample_rate_hertz=sample_rate, audio_format=audio_format)
     if transcript is None:
         raise HTTPException(
             status_code=422,

@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Parali Setu — Company</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="page">
+
+  <header class="top">
+    <h1>🌾 Parali Setu</h1>
+    <nav>
+      <a href="index.html">Farmer</a>
+      <a href="company.html" class="active">Company</a>
+    </nav>
+  </header>
+
+  <div class="card">
+    <h2>Company</h2>
+    <div class="row">
+      <select id="company-select">
+        <option value="co_1">Co_Plates_Gujarat</option>
+        <option value="co_2">Co_Pellets_Punjab</option>
+        <option value="co_3">Co_Board_WestBengal</option>
+        <option value="co_4">Co_Road_Haryana</option>
+        <option value="co_5">Co_Plates_Delhi</option>
+      </select>
+      <button id="refresh-btn" class="secondary">Refresh</button>
+    </div>
+    <p class="hint">Demo companies seeded for the live build (PRD Section 15). Dashboard updates whenever a farmer's listing matches this company.</p>
+  </div>
+
+  <div class="card">
+    <h2>Recommendation</h2>
+    <div id="recommendation"><p class="empty-state">Loading…</p></div>
+  </div>
+
+  <div class="card">
+    <h2>Incoming Supply</h2>
+    <div id="incoming-supply"><p class="empty-state">Loading…</p></div>
+  </div>
+
+  <div class="card">
+    <h2>Active Matches</h2>
+    <div id="active-matches"><p class="empty-state">Loading…</p></div>
+  </div>
+
+  <div class="card">
+    <h2>Standing Demand</h2>
+    <p class="hint">Post or update what this company is buying right now.</p>
+    <div class="row">
+      <input type="text" id="demand-product" placeholder="product (e.g. biofuel_pellets)">
+      <select id="demand-crop">
+        <option value="rice_stubble">rice_stubble</option>
+        <option value="wheat_stubble">wheat_stubble</option>
+      </select>
+    </div>
+    <div class="row">
+      <input type="number" id="demand-qty" placeholder="quantity needed (kg)">
+      <input type="number" id="demand-price" placeholder="price offered (₹/kg)" step="0.01">
+    </div>
+    <div class="row" style="margin-top:.5rem;">
+      <button id="post-demand-btn" class="primary">Post demand</button>
+    </div>
+    <p id="demand-result" class="hint"></p>
+  </div>
+
+</div>
+
+<script src="config.js"></script>
+<script src="company.js"></script>
+</body>
+</html>

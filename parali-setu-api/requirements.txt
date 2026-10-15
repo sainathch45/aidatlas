@@ -1,7 +1,11 @@
 fastapi>=0.115
 uvicorn[standard]>=0.30
+python-multipart>=0.0.9
 google-genai>=0.5
 google-cloud-firestore>=2.18
+google-cloud-speech>=2.41
+google-cloud-texttospeech>=2.38
+google-cloud-bigquery>=3.25
 ortools>=9.11
 pydantic>=2.8
 python-dotenv>=1.0

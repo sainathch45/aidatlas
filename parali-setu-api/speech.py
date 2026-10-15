@@ -27,7 +27,22 @@ VOICE_BY_LANGUAGE = {
 }
 
 
-def transcribe_audio(audio_bytes: bytes, language: str, sample_rate_hertz: int = 16000) -> str | None:
+AUDIO_ENCODING_BY_FORMAT = {
+    # LINEAR16 is what the live smoke tests use (synthesized via Cloud
+    # TTS as a known-good fixture). WEBM_OPUS is what a real browser's
+    # MediaRecorder produces by default (audio/webm;codecs=opus) -- the
+    # format main.py's /listings/voice actually receives from the
+    # frontend. Verified live 2026-10-15 with a genuine WebM/Opus file
+    # (ffmpeg-encoded from a real TTS source, not a hand-wave) -- the
+    # exact Punjabi sentence transcribed back correctly.
+    "linear16": speech.RecognitionConfig.AudioEncoding.LINEAR16,
+    "webm_opus": speech.RecognitionConfig.AudioEncoding.WEBM_OPUS,
+}
+
+
+def transcribe_audio(
+    audio_bytes: bytes, language: str, sample_rate_hertz: int = 16000, audio_format: str = "linear16"
+) -> str | None:
     """PRD 8.1.2 -- farmer's spoken listing to text. Returns None (not an
     exception) on failure, so callers show the confirm/edit text box
     directly rather than erroring the whole flow -- a transcription miss
@@ -35,7 +50,7 @@ def transcribe_audio(audio_bytes: bytes, language: str, sample_rate_hertz: int =
     lang_code, _ = VOICE_BY_LANGUAGE.get(language, ("hi-IN", None))
     client = speech.SpeechClient()
     config = speech.RecognitionConfig(
-        encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
+        encoding=AUDIO_ENCODING_BY_FORMAT.get(audio_format, speech.RecognitionConfig.AudioEncoding.LINEAR16),
         sample_rate_hertz=sample_rate_hertz,
         language_code=lang_code,
     )
@@ -52,14 +67,18 @@ def transcribe_audio(audio_bytes: bytes, language: str, sample_rate_hertz: int =
 def synthesize_speech(text: str, language: str) -> bytes | None:
     """PRD 8.1.6 -- Gemini's narration text to audio, in the farmer's
     language. Returns None on failure; callers fall back to showing the
-    text-only explanation rather than erroring the whole response."""
+    text-only explanation rather than erroring the whole response.
+
+    MP3, not LINEAR16: a raw LINEAR16 stream has no container header, so
+    a browser <audio> tag can't play it directly from a data: URI --
+    MP3 is self-contained. Caught before this shipped to the frontend,
+    not after.
+    """
     lang_code, voice_name = VOICE_BY_LANGUAGE.get(language, ("hi-IN", "hi-IN-Chirp3-HD-Achernar"))
     client = texttospeech.TextToSpeechClient()
     synth_input = texttospeech.SynthesisInput(text=text)
     voice = texttospeech.VoiceSelectionParams(language_code=lang_code, name=voice_name)
-    audio_config = texttospeech.AudioConfig(
-        audio_encoding=texttospeech.AudioEncoding.LINEAR16, sample_rate_hertz=16000
-    )
+    audio_config = texttospeech.AudioConfig(audio_encoding=texttospeech.AudioEncoding.MP3)
     try:
         response = client.synthesize_speech(input=synth_input, voice=voice, audio_config=audio_config)
     except Exception:

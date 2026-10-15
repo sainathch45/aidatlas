@@ -1,3 +1,5 @@
+> **This branch (`parali-setu`) also carries a second, newer project — Parali Setu — built in parallel to this one. See the [Parali Setu](#parali-setu) section below.** `master` has only AidAtlas.
+
 # AidAtlas
 
 **Google Cloud AI Builder Cup, JAPAC 2026 — Sustainability & Social Impact track**
@@ -73,3 +75,44 @@ python tests/e2e_flow.py <frontend-url> <screenshot-dir> # Playwright: load, all
 - 48 of 61 districts have real plotted map coordinates (derived from HDX's food-price market locations); the remaining 13 are listed in data, not given a fabricated point.
 - Gemini's free tier caps at 20 requests/day for `gemini-3.8-flash` (confirmed live, not documented anywhere obvious beforehand) — both `/allocate` and `/ask` degrade gracefully to real BigQuery/Firestore numbers without Gemini commentary if that's exhausted, rather than failing.
 - The allocation model is a simple, explainable proportional split by need score, not a constrained optimizer — a deliberate choice, see "Why this fits the brief" above.
+- **This README predates later additions to AidAtlas** (an OR-Tools constrained-dispatch layer, Myanmar as a second HRP crisis, an "AI-drafted" mode for Maharashtra/Assam with live satellite/SAR signals) — check `git log master` for the real current state rather than trusting this file's feature list as exhaustive. Flagged here rather than silently left stale.
+
+---
+
+## Parali Setu
+
+A second, independent project built on this branch (`parali-setu`) in
+parallel to AidAtlas — a live matching system connecting farmers who have
+crop stubble with companies that turn it into packaging, cutlery, and
+biofuel pellets, instead of it getting burned.
+
+**Live:**
+- Farmer app: https://parali-setu.web.app
+- Company dashboard: https://parali-setu.web.app/company.html
+- API: https://parali-setu-api-866617346749.asia-southeast1.run.app
+
+**Full spec:** [`docs/PARALI_SETU_PRD.md`](docs/PARALI_SETU_PRD.md) — the
+governing document, including the problem statement, architecture, data
+model, and the build-sequencing table that was actually followed.
+
+**Repo layout** (new, scoped directories — nothing here touches
+AidAtlas's files above):
+
+```
+docs/PARALI_SETU_PRD.md    The spec. Read this first.
+parali-setu-api/           FastAPI backend -- see its own README.md
+parali-setu-frontend/      Plain HTML/JS frontend -- see its own README.md
+```
+
+**Status as of 2026-10-15:** backend and frontend both deployed and
+live-verified end to end (text and voice listings in Hindi/Punjabi, the
+optional photo quality read, negotiation, and the BigQuery ML demand
+forecast all confirmed working against the real deployed services, not
+just locally). Known gaps are listed honestly in each sub-project's
+README rather than hidden — read those before extending this.
+
+This was built using the same reused GCP project as AidAtlas
+(`ai-builder-cup-aidatlas`) — same Vertex AI/Firestore/Cloud Run setup,
+disjoint Firestore collection names and a separate Firebase Hosting site
+(`parali-setu`) and Cloud Run service (`parali-setu-api`), so neither
+project's data or deployment affects the other's.
