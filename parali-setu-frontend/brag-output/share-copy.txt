@@ -1,0 +1,3 @@
+🌾 Parali Setu: an AI-mediated marketplace that pays Punjab's farmers to sell their stubble instead of burning it — live voice in Hindi & Punjabi, a real OR-Tools match, a real BigQuery ML forecast. Built for the Google Cloud AI Builder Cup 2026.
+
+parali-setu.web.app

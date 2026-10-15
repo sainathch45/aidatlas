@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <title>Parali Setu — Brag</title>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      @font-face {
+        font-family: "Fraunces";
+        font-weight: 500;
+        src: url("assets/fonts/fraunces-500.ttf") format("truetype");
+      }
+      @font-face {
+        font-family: "Fraunces";
+        font-weight: 600;
+        src: url("assets/fonts/fraunces-600.ttf") format("truetype");
+      }
+      @font-face {
+        font-family: "IBM Plex Mono";
+        font-weight: 400;
+        src: url("assets/fonts/plexmono-400.ttf") format("truetype");
+      }
+      @font-face {
+        font-family: "IBM Plex Mono";
+        font-weight: 500;
+        src: url("assets/fonts/plexmono-500.ttf") format("truetype");
+      }
+
+      :root {
+        --bg: #fbfaf7;
+        --surface: #ffffff;
+        --ink: #201c14;
+        --ink-soft: #5c5648;
+        --smoke: #8b8575;
+        --accent: #b8651f;
+        --accent-ink: #5c3410;
+        --accent-soft: #faeadb;
+        --line: #e7e2d6;
+        --smoke-dark: #2b2621;
+        --smoke-mid: #6b6358;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1920px; height: 1080px; overflow: hidden; background: var(--smoke-dark); }
+      #root { width: 100%; height: 100%; font-family: "IBM Plex Mono", monospace; position: relative; }
+
+      .scene { position: absolute; inset: 0; width: 100%; height: 100%; background: var(--bg); overflow: hidden; }
+      .pad { padding: 0 160px; }
+
+      .display {
+        font-family: "Fraunces", Georgia, serif;
+        font-weight: 600;
+        color: var(--ink);
+        line-height: 1.08;
+        letter-spacing: -0.01em;
+      }
+      .mono-label {
+        font-family: "IBM Plex Mono", monospace;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--smoke);
+      }
+
+      /* ---- Sky treatment (scenes 1 & 9) ---- */
+      .sky { position: absolute; inset: 0; }
+      .sky-warm {
+        position: absolute; inset: 0;
+        background: radial-gradient(ellipse at 50% 30%, #e3a35c 0%, var(--accent-soft) 45%, var(--bg) 100%);
+      }
+      .sky-smoke {
+        position: absolute; inset: 0;
+        background: linear-gradient(180deg, var(--smoke-dark) 0%, var(--smoke-mid) 55%, #4a4237 100%);
+        opacity: 0;
+      }
+      .sky-text {
+        position: relative; z-index: 2; height: 100%;
+        display: flex; align-items: center; justify-content: center; text-align: center;
+        padding-top: 24px;
+      }
+      .sky-text .display { font-size: 72px; color: #f4efe6; max-width: 1400px; text-wrap: balance; }
+      .sky-text .display.dark-ink { color: var(--ink); }
+
+      /* ---- Stat scene ---- */
+      .stat-wrap { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 36px; text-align: center; }
+      .stat-big { font-size: 104px; color: var(--ink); }
+      .stat-reason { font-size: 46px; font-weight: 500; color: var(--ink-soft); max-width: 1300px; text-wrap: balance; opacity: 0; }
+
+      /* ---- Product reveal ---- */
+      .reveal-wrap { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 28px; text-align: center; }
+      .wordmark { font-size: 148px; color: var(--ink); display: flex; align-items: center; gap: 28px; }
+      .wordmark .emoji { font-size: 132px; }
+      .tagline { font-size: 34px; color: var(--ink-soft); font-family: "IBM Plex Mono", monospace; max-width: 1200px; line-height: 1.5; opacity: 0; }
+
+      /* ---- Farmer flow card (recreates real .card/.transcript/.match-card) ---- */
+      .flow-stage { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+      .phone-frame {
+        width: 820px; background: var(--surface); border: 1px solid var(--line); border-radius: 20px;
+        padding: 48px 52px; box-shadow: 0 20px 60px rgba(32,28,20,.10);
+      }
+      .mic-row { display: flex; align-items: center; gap: 20px; margin-bottom: 28px; }
+      .mic-dot { width: 64px; height: 64px; border-radius: 999px; border: 3px solid var(--accent); display: flex; align-items: center; justify-content: center; font-size: 30px; }
+      .lang-pill { font-family: "IBM Plex Mono", monospace; font-size: 20px; background: var(--accent-soft); color: var(--accent-ink); padding: 6px 16px; border-radius: 999px; font-weight: 500; }
+      .transcript-box { font-family: "IBM Plex Mono", monospace; font-size: 30px; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 24px 28px; min-height: 90px; }
+      .gloss { font-size: 22px; color: var(--smoke); margin-top: 14px; opacity: 0; }
+
+      .match-card { width: 820px; background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 44px 52px; box-shadow: 0 20px 60px rgba(32,28,20,.10); display: flex; flex-direction: column; gap: 22px; }
+      .match-row { display: flex; justify-content: space-between; align-items: baseline; opacity: 0; }
+      .match-row .label { font-family: "IBM Plex Mono", monospace; font-size: 20px; text-transform: uppercase; letter-spacing: .06em; color: var(--smoke); }
+      .match-row .value { font-family: "IBM Plex Mono", monospace; font-size: 30px; font-weight: 500; color: var(--ink); }
+      .match-row .value.price { color: var(--accent-ink); }
+      .explain-line { font-family: "Fraunces", serif; font-size: 24px; color: var(--ink-soft); opacity: 0; padding-top: 6px; border-top: 1px solid var(--line); }
+
+      /* ---- Negotiation ---- */
+      .negotiate-wrap { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+      .negotiate-card { width: 760px; display: flex; flex-direction: column; gap: 32px; align-items: center; text-align: center; }
+      .negotiate-bubble { font-family: "IBM Plex Mono", monospace; font-size: 28px; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 22px 30px; opacity: 0; }
+      .price-tick { font-family: "Fraunces", serif; font-weight: 600; font-size: 108px; color: var(--accent-ink); }
+
+      /* ---- Company rec card (recreates real .rec-card) ---- */
+      .company-stage { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+      .rec-card { width: 900px; background: var(--accent-soft); border: 1px solid var(--accent); border-radius: 18px; padding: 44px 50px; opacity: 0; }
+      .rec-card .headline { font-family: "Fraunces", serif; font-weight: 600; font-size: 44px; color: var(--accent-ink); margin-bottom: 14px; }
+      .rec-card .hint { font-family: "IBM Plex Mono", monospace; font-size: 22px; color: var(--accent-ink); opacity: .85; line-height: 1.5; }
+      .rec-caption { font-family: "IBM Plex Mono", monospace; font-size: 20px; color: var(--smoke); margin-top: 20px; opacity: 0; text-align: center; }
+
+      /* ---- Capability claims ---- */
+      .claim-wrap { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+      .claim-text { font-family: "Fraunces", serif; font-weight: 600; font-size: 72px; color: var(--ink); text-align: center; max-width: 1500px; text-wrap: balance; }
+
+      /* ---- Outro ---- */
+      .outro-wrap { position: relative; z-index: 2; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 26px; text-align: center; }
+      .outro-line { font-family: "Fraunces", serif; font-weight: 600; font-size: 68px; color: var(--ink); opacity: 0; }
+      .outro-wordmark { font-size: 96px; color: var(--ink); display: flex; align-items: center; gap: 20px; opacity: 0; }
+      .outro-tagline { font-family: "IBM Plex Mono", monospace; font-size: 26px; color: var(--ink-soft); opacity: 0; }
+      .outro-url { font-family: "IBM Plex Mono", monospace; font-size: 24px; color: var(--accent-ink); font-weight: 500; opacity: 0; }
+      .outro-credit { font-family: "IBM Plex Mono", monospace; font-size: 18px; color: var(--ink-soft); opacity: 0; }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="180"
+      data-width="1920"
+      data-height="1080"
+    >
+      <!-- Scene 1 — Hook — 0-15s -->
+      <section id="s1" class="clip scene" data-start="0" data-duration="15" data-track-index="0">
+        <div class="sky">
+          <div id="s1-warm" class="sky-warm"></div>
+          <div id="s1-smoke" class="sky-smoke"></div>
+        </div>
+        <div class="sky-text">
+          <div id="s1-text" class="display">EVERY OCTOBER,<br />PUNJAB'S SKY TURNS TO SMOKE.</div>
+        </div>
+      </section>
+
+      <!-- Scene 2 — The real scale — 15-30s -->
+      <section id="s2" class="clip scene" data-start="15" data-duration="15" data-track-index="0">
+        <div class="stat-wrap">
+          <div id="s2-stat" class="display stat-big">15–20 MILLION TONNES.<br />BURNED. EVERY SEASON.</div>
+          <div id="s2-reason" class="stat-reason">Not because farmers want to.<br />Because nothing faster exists.</div>
+        </div>
+      </section>
+
+      <!-- Scene 3 — Product reveal — 30-45s -->
+      <section id="s3" class="clip scene" data-start="30" data-duration="15" data-track-index="0">
+        <div class="reveal-wrap">
+          <div id="s3-word" class="wordmark"><span class="emoji">🌾</span><span>PARALI SETU</span></div>
+          <div id="s3-tag" class="tagline">Parali. Stubble. Setu. Bridge.<br />A live match between farmers who have it,<br />and buyers who'll pay for it — before it burns.</div>
+        </div>
+      </section>
+
+      <!-- Scene 4 — Farmer flow part 1: the listing — 45-65s -->
+      <section id="s4" class="clip scene" data-start="45" data-duration="20" data-track-index="0">
+        <div class="flow-stage">
+          <div class="phone-frame">
+            <div class="mic-row">
+              <div class="mic-dot">🎤</div>
+              <span class="lang-pill">PUNJABI</span>
+            </div>
+            <div id="s4-transcript" class="transcript-box"></div>
+            <div id="s4-gloss" class="gloss">"I have 12 quintals of stubble, in Sangrur."</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Scene 5 — Farmer flow part 2: the match — 65-85s -->
+      <section id="s5" class="clip scene" data-start="65" data-duration="20" data-track-index="0">
+        <div class="flow-stage">
+          <div class="match-card">
+            <div id="s5-row-qty" class="match-row"><span class="label">Quantity</span><span class="value">1200 kg</span></div>
+            <div id="s5-row-crop" class="match-row"><span class="label">Crop</span><span class="value">rice stubble</span></div>
+            <div id="s5-row-buyer" class="match-row"><span class="label">Buyer</span><span class="value">Co_Board_WestBengal</span></div>
+            <div id="s5-row-price" class="match-row"><span class="label">Price</span><span class="value price">₹8.68 / kg</span></div>
+            <div id="s5-row-pickup" class="match-row"><span class="label">Pickup by</span><span class="value">2026-11-03</span></div>
+            <div id="s5-explain" class="explain-line">"खरीदार Co_Board_WestBengal के साथ सौदा तय हो गया है।"</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Scene 6 — Negotiation proof — 85-100s -->
+      <section id="s6" class="clip scene" data-start="85" data-duration="15" data-track-index="0">
+        <div class="negotiate-wrap">
+          <div class="negotiate-card">
+            <div id="s6-bubble" class="negotiate-bubble">"can we get 9.50 per kg instead?"</div>
+            <div id="s6-price" class="price-tick">₹8.68</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Scene 7 — Company forecast — 100-118s -->
+      <section id="s7" class="clip scene" data-start="100" data-duration="18" data-track-index="0">
+        <div class="company-stage">
+          <div style="display:flex; flex-direction:column; align-items:center;">
+            <div id="s7-rec" class="rec-card">
+              <div class="headline">Prioritize disposable plates — target Gujarat</div>
+              <div class="hint">Peak demand week starting Oct 29: ~3,967 units — BigQuery ML forecast, trained offline on the real seasonal corpus.</div>
+            </div>
+            <div id="s7-caption" class="rec-caption">Trained offline on real seasonal demand. Not a guess.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Scene 8 — Three capability claims — 118-142s -->
+      <section id="s8a" class="clip scene" data-start="118" data-duration="8" data-track-index="0">
+        <div class="claim-wrap"><div id="s8a-text" class="claim-text">GEMINI LISTENS.<br />IN HINDI. IN PUNJABI.</div></div>
+      </section>
+      <section id="s8b" class="clip scene" data-start="126" data-duration="8" data-track-index="0">
+        <div class="claim-wrap"><div id="s8b-text" class="claim-text">OR-TOOLS DECIDES EVERY NUMBER.<br />GEMINI NEVER TOUCHES ONE.</div></div>
+      </section>
+      <section id="s8c" class="clip scene" data-start="134" data-duration="8" data-track-index="0">
+        <div class="claim-wrap"><div id="s8c-text" class="claim-text">BIGQUERY ML<br />SEES THE SEASON AHEAD.</div></div>
+      </section>
+
+      <!-- Scene 9 — Turn back + outro — 142-180s -->
+      <section id="s9" class="clip scene" data-start="142" data-duration="38" data-track-index="0">
+        <div class="sky">
+          <div id="s9-warm" class="sky-warm"></div>
+          <div id="s9-smoke" class="sky-smoke"></div>
+        </div>
+        <div class="outro-wrap">
+          <div id="s9-line" class="outro-line">SELLING. NOT BURNING.</div>
+          <div id="s9-word" class="outro-wordmark"><span class="emoji" style="font-size:72px;">🌾</span><span>PARALI SETU</span></div>
+          <div id="s9-tag" class="outro-tagline">A live bridge between farmers and buyers.</div>
+          <div id="s9-url" class="outro-url">parali-setu.web.app</div>
+          <div id="s9-credit" class="outro-credit">Built for the Google Cloud AI Builder Cup, JAPAC 2026</div>
+        </div>
+      </section>
+
+      <!-- Audio -->
+      <!-- Track is 117.36s, shorter than the 180s composition -- two overlapping
+           clips crossfade around 115-118s so the bed covers the full runtime. -->
+      <audio id="bg-music-a" data-start="0" data-duration="117.36" data-track-index="10" data-volume="1"
+        data-automation='{"version":1,"lanes":[{"target":"volume","points":[{"t":0,"v":0},{"t":1.5,"v":0.15},{"t":30,"v":0.15},{"t":33,"v":0.30},{"t":115,"v":0.30},{"t":117.36,"v":0}]}]}'
+        src="assets/music/happy-beats-business-moves-vol-12-by-ende-dot-app.mp3"></audio>
+      <audio id="bg-music-b" data-start="115" data-duration="65" data-track-index="19" data-volume="1"
+        data-automation='{"version":1,"lanes":[{"target":"volume","points":[{"t":0,"v":0},{"t":3,"v":0.30},{"t":5,"v":0.20},{"t":27,"v":0.20},{"t":30,"v":0.32},{"t":59,"v":0.15},{"t":65,"v":0}]}]}'
+        src="assets/music/happy-beats-business-moves-vol-12-by-ende-dot-app.mp3"></audio>
+
+      <audio id="sfx-reveal" data-start="30" data-duration="1.48" data-track-index="11" data-volume="0.75" src="assets/sfx/impact/impactBell_heavy_000.ogg"></audio>
+      <audio id="sfx-row-qty" data-start="65.4" data-duration="0.69" data-track-index="12" data-volume="0.55" src="assets/sfx/casino/card-place-1.ogg"></audio>
+      <audio id="sfx-row-crop" data-start="66.1" data-duration="0.69" data-track-index="13" data-volume="0.55" src="assets/sfx/casino/card-place-1.ogg"></audio>
+      <audio id="sfx-row-buyer" data-start="66.8" data-duration="0.69" data-track-index="14" data-volume="0.55" src="assets/sfx/casino/card-place-1.ogg"></audio>
+      <audio id="sfx-row-price" data-start="67.5" data-duration="0.69" data-track-index="15" data-volume="0.70" src="assets/sfx/casino/card-place-1.ogg"></audio>
+      <audio id="sfx-negotiate-click" data-start="88.5" data-duration="0.10" data-track-index="16" data-volume="0.65" src="assets/sfx/interface/click_001.ogg"></audio>
+      <audio id="sfx-rec-drop" data-start="101" data-duration="0.11" data-track-index="17" data-volume="0.60" src="assets/sfx/interface/drop_001.ogg"></audio>
+      <audio id="sfx-outro-bell" data-start="146" data-duration="0.65" data-track-index="18" data-volume="0.75" src="assets/sfx/impact/impactBell_heavy_003.ogg"></audio>
+    </div>
+
+    <script>
+      const tl = gsap.timeline({ paused: true });
+
+      // ---- Scene 1: hook (0-15s) ----
+      tl.fromTo("#s1-smoke", { opacity: 0 }, { opacity: 1, duration: 3.5, ease: "power1.inOut" }, 0.3);
+      tl.fromTo("#s1-text", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 1.0, ease: "power3.out" }, 0.6);
+
+      // ---- Scene 2: the real scale (15-30s), clip-local start 0 ----
+      tl.fromTo("#s2-stat", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, 15.3);
+      tl.fromTo("#s2-reason", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" }, 20.5);
+
+      // ---- Scene 3: product reveal (30-45s) ----
+      tl.fromTo("#s3-word", { opacity: 0, scale: 0.94 }, { opacity: 1, scale: 1, duration: 0.7, ease: "back.out(1.4)" }, 30.1);
+      tl.fromTo("#s3-tag", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" }, 31.2);
+
+      // ---- Scene 4: farmer listing (45-65s) ----
+      (function () {
+        const full = "ਮੇਰੇ ਕੋਲ 12 ਕੁਇੰਟਲ ਪਰਾਲੀ ਹੈ ਸੰਗਰੂਰ ਵਿੱਚ";
+        const el = document.getElementById("s4-transcript");
+        const chars = full.split("");
+        let acc = "";
+        const typeStart = 45.4;
+        const perChar = (16 / chars.length); // spread typing across ~16s of the 20s scene
+        chars.forEach((c, i) => {
+          acc += c;
+          const frozen = acc;
+          tl.call(() => { el.textContent = frozen; }, [], typeStart + i * perChar);
+        });
+        tl.fromTo("#s4-gloss", { opacity: 0 }, { opacity: 1, duration: 0.6 }, typeStart + chars.length * perChar + 0.5);
+      })();
+
+      // ---- Scene 5: the match (65-85s) ----
+      const matchRows = ["#s5-row-qty", "#s5-row-crop", "#s5-row-buyer", "#s5-row-price", "#s5-row-pickup"];
+      matchRows.forEach((sel, i) => {
+        tl.fromTo(sel, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 65.4 + i * 0.7);
+      });
+      tl.fromTo("#s5-explain", { opacity: 0 }, { opacity: 1, duration: 0.7 }, 65.4 + matchRows.length * 0.7 + 0.6);
+
+      // ---- Scene 6: negotiation (85-100s) ----
+      tl.fromTo("#s6-bubble", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.6 }, 85.3);
+      const priceTick = { v: 8.68 };
+      const priceEl = document.getElementById("s6-price");
+      tl.to(priceTick, {
+        v: 9.5, duration: 0.8, ease: "power2.out",
+        onUpdate: function () { priceEl.textContent = "₹" + priceTick.v.toFixed(2); },
+      }, 88.7);
+
+      // ---- Scene 7: company forecast (100-118s) ----
+      tl.fromTo("#s7-rec", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 101.0);
+      tl.fromTo("#s7-caption", { opacity: 0 }, { opacity: 1, duration: 0.6 }, 103.2);
+
+      // ---- Scene 8: capability claims (118-142s) ----
+      tl.fromTo("#s8a-text", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.6 }, 118.3);
+      tl.fromTo("#s8b-text", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.6 }, 126.3);
+      tl.fromTo("#s8c-text", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.6 }, 134.3);
+
+      // ---- Scene 9: turn back + outro (142-180s) ----
+      tl.fromTo("#s9-smoke", { opacity: 1 }, { opacity: 1, duration: 0.1 }, 142.0);
+      tl.to("#s9-smoke", { opacity: 0, duration: 4.0, ease: "power1.inOut" }, 142.3);
+      tl.fromTo("#s9-line", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.8 }, 143.5);
+      tl.fromTo("#s9-word", { opacity: 0, scale: 0.96 }, { opacity: 1, scale: 1, duration: 0.7, ease: "back.out(1.3)" }, 150.0);
+      tl.fromTo("#s9-tag", { opacity: 0 }, { opacity: 1, duration: 0.6 }, 151.3);
+      tl.fromTo("#s9-url", { opacity: 0 }, { opacity: 1, duration: 0.6 }, 152.6);
+      tl.fromTo("#s9-credit", { opacity: 0 }, { opacity: 1, duration: 0.6 }, 154.0);
+      tl.to("#s9-word", { opacity: 1, duration: 24 }, 154.6); // long confident hold to the end
+
+      window.__timelines["main"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>
