@@ -29,23 +29,29 @@ def extract_listing(client: genai.Client, raw_text: str, language: str, today: d
     """
     today = today or date.today()
     prompt = f"""You are extracting a structured crop-residue (stubble) listing
-from a farmer's message. The message is in {language}. Today's date is
-{today.isoformat()} -- resolve any relative or bare date (e.g. "by the 25th",
-"next week") against this date, in the near future, never a past or
-far-future year. Respond with ONLY a JSON object, no other text, matching
-exactly this shape:
+from a farmer's message. The message is in {language}. This message may be a
+speech-to-text transcript and can contain recognition errors -- words that
+don't quite fit grammatically, or a stray word that doesn't belong. Today's
+date is {today.isoformat()}. Respond with ONLY a JSON object, no other text,
+matching exactly this shape:
 
 {{
   "quantity_kg": <number, convert quintals to kg by multiplying by 100 if the farmer used quintals>,
   "crop_type": <one of "rice_stubble" or "wheat_stubble">,
   "village_or_district": <string, as stated>,
-  "ready_by": <ISO date string YYYY-MM-DD if a date/timeframe was given, else null>,
+  "ready_by": <ISO date string YYYY-MM-DD, or null>,
   "contact": <string if a phone number or name was given, else null>
 }}
 
-If any field genuinely cannot be determined from the message, use null for
-that field rather than guessing a number. Do not invent a quantity, date, or
-crop type that wasn't stated or clearly implied.
+Strict rule for ready_by, since a wrong specific date is worse than none: only
+fill it in if the message states an explicit day number (e.g. "the 25th",
+"20 October") or an unambiguous relative timeframe (e.g. "next week", "in 5
+days") that you can resolve against today's date. If the message only names a
+month with no day (e.g. a stray or garbled word near "October" with no
+number), or is otherwise vague, return null -- do NOT guess, round to, or
+infer any particular day of that month. The same caution applies to every
+other field: if a word looks like a transcription error or doesn't clearly
+state a value, use null rather than resolving it to a specific guess.
 
 Farmer's message: "{raw_text}"
 """

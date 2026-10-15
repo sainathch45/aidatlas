@@ -11,7 +11,9 @@ message in, a match out, same pipeline voice will feed into later.
 """
 from __future__ import annotations
 
-from fastapi import FastAPI, HTTPException
+import base64
+
+from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
@@ -19,6 +21,7 @@ import firestore_store as store
 from extraction import explain_match, extract_listing, parse_negotiation_price
 from gemini_client import get_gemini_client
 from solver import Demand, Listing, apply_negotiation, solve_matches
+from speech import synthesize_speech, transcribe_audio
 
 app = FastAPI(title="Parali Setu API")
 app.add_middleware(
@@ -71,19 +74,22 @@ def health():
     return {"status": "ok"}
 
 
-@app.post("/listings")
-def create_listing(req: ListingRequest):
-    """PRD 8.1 steps 2-6: extract -> write -> solve live -> explain."""
+def _create_listing_from_text(farmer_id: str, raw_text: str, language: str) -> dict:
+    """PRD 8.1 steps 2-6: extract -> write -> solve live -> explain.
+    Shared by the text endpoint and the voice endpoint below -- voice
+    only adds a transcription step in front of this, never a second
+    implementation of it (PRD 8.1: 'Gemini extracts... whether spoken
+    or typed' is one path, not two)."""
     db = store.get_firestore_client()
     client = get_gemini_client()
 
-    extracted = extract_listing(client, req.raw_text, req.language)
+    extracted = extract_listing(client, raw_text, language)
     if extracted is None:
         raise HTTPException(status_code=503, detail="Could not understand the listing right now -- please try again")
     if extracted.get("quantity_kg") is None or extracted.get("crop_type") is None:
         raise HTTPException(status_code=422, detail="Missing quantity or crop type -- please confirm these details")
 
-    listing_doc = store.save_listing(db, req.farmer_id, extracted, req.language)
+    listing_doc = store.save_listing(db, farmer_id, extracted, language)
 
     all_listings = [l for l in (_to_solver_listing(d) for d in store.get_open_listings(db)) if l]
     all_demand = [_to_solver_demand(d) for d in store.get_open_demand(db)]
@@ -93,6 +99,7 @@ def create_listing(req: ListingRequest):
     saved_matches = store.save_matches(db, this_listing_results)
 
     explanation = None
+    explanation_audio_base64 = None
     if saved_matches:
         m = saved_matches[0]
         company_doc = db.collection("companies").document(m["company_id"]).get()
@@ -105,10 +112,40 @@ def create_listing(req: ListingRequest):
                 "price_agreed_per_kg": m["price_agreed_per_kg"],
                 "pickup_window": listing_doc.get("ready_by", "to be confirmed"),
             },
-            req.language,
+            language,
         )
+        if explanation:
+            audio_bytes = synthesize_speech(explanation, language)
+            if audio_bytes:
+                explanation_audio_base64 = base64.b64encode(audio_bytes).decode("ascii")
 
-    return {"listing": listing_doc, "matches": saved_matches, "explanation": explanation}
+    return {
+        "listing": listing_doc,
+        "matches": saved_matches,
+        "explanation": explanation,
+        "explanation_audio_base64": explanation_audio_base64,
+    }
+
+
+@app.post("/listings")
+def create_listing(req: ListingRequest):
+    return _create_listing_from_text(req.farmer_id, req.raw_text, req.language)
+
+
+@app.post("/listings/voice")
+async def create_listing_voice(farmer_id: str, language: str, audio: UploadFile = File(...)):
+    """PRD 8.1.1-2: spoken listing in. 16kHz LINEAR16 mono, matching the
+    sample rate confirmed live for both hi-IN and pa-IN (speech.py)."""
+    audio_bytes = await audio.read()
+    transcript = transcribe_audio(audio_bytes, language)
+    if transcript is None:
+        raise HTTPException(
+            status_code=422,
+            detail="Could not transcribe that -- please try again or type the listing instead",
+        )
+    result = _create_listing_from_text(farmer_id, transcript, language)
+    result["transcript"] = transcript
+    return result
 
 
 @app.post("/companies/{company_id}/demand")
