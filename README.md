@@ -3,7 +3,7 @@
 **Google Cloud AI Builder Cup, JAPAC 2026 — Sustainability & Social Impact track**
 Team Ctrl Alt Conquer — Command. Control. Conquer.
 
-Gemini-grounded crisis resource allocation, built on real Humanitarian Data Exchange (HDX) data for Syria's 2026 Humanitarian Needs and Response Plan (HSYR26) — currently **32% funded** against $2,922,184,830 required.
+Gemini-grounded crisis resource allocation, built on real Humanitarian Data Exchange (HDX) data. Started as a single-crisis Syria allocator; now covers two real, active UN Humanitarian Response Plans (Syria, Myanmar) plus two Indian disasters (Maharashtra drought, Assam floods) with no formal HRP, handled as explicitly-labeled "AI-drafted, not official" plans instead.
 
 **Live:**
 - App: https://ai-builder-cup-aidatlas.web.app
@@ -11,9 +11,13 @@ Gemini-grounded crisis resource allocation, built on real Humanitarian Data Exch
 
 ## What it does
 
-AidAtlas splits the real, currently-available $935,449,756 HSYR26 funding pool across 61 real Syrian districts, weighted by a need score (real IDP population, discounted by how many organizations are already active there, from HDX's operational-presence data) — then asks Gemini to write a plain-language, numbers-grounded rationale for each allocation. A coordinator can also challenge any result in natural language ("why not send more to district X?") and get an answer that cites only real figures already in the system, never invented ones.
+For Syria and Myanmar ("hrp_grounded" crises), AidAtlas splits the real, currently-available HSYR26/HMMR26 funding pool across real districts, weighted by a need score from real HDX data — then asks Gemini to write a plain-language, numbers-grounded rationale for each allocation.
 
-The differentiating bet here isn't a fancier optimizer — it's **explainability over raw optimality**: every dollar allocated comes with a defensible reason a coordinator could show a donor or auditor, not just a number.
+For Maharashtra and Assam ("ai_drafted" crises, no official appeal exists), there's no funding pool to split, so `optimizer.py` runs a real OR-Tools CP-SAT constrained-dispatch model instead: a user-set capacity is allocated across districts weighted by need, a **road-chokepoint network multiplier** (real driving routes via the Google Routes API — a district that sits on the route to several others gets boosted), and an **access factor** capped by live Sentinel-1 SAR flood-extent detection (a badly flooded district can still receive some aid, never zero). Gemini's prompt is told to explain the solver's actual reasoning, not just narrate a rank.
+
+A coordinator can also challenge any result in natural language ("why not send more to district X?") and get an answer that cites only real figures already in the system, never invented ones.
+
+The differentiating bet here isn't a fancier optimizer alone — it's **explainability over raw optimality**, extended across two genuinely different data shapes (official funded appeals vs. no-appeal disasters) and two real solving strategies (proportional split vs. constrained dispatch), reused across crises rather than rebuilt per crisis.
 
 ## Why this fits the brief
 
@@ -26,19 +30,22 @@ The differentiating bet here isn't a fancier optimizer — it's **explainability
 
 | Service | What it does here |
 |---|---|
-| **Gemini** (Developer API, `gemini-3.8-flash`) | Generates per-district allocation rationale (batched, JSON mode) and answers natural-language coordinator questions, grounded in real Firestore data |
-| **BigQuery** | Hosts the raw HDX tables and the `district_need_score` view (need = IDP population discounted by existing org presence) that the allocation model reads |
+| **Gemini** (Vertex AI, `gemini-3.8-flash`, global endpoint) | Generates per-district allocation rationale (batched, JSON mode) and answers natural-language coordinator questions, grounded in real Firestore data. Migrated here from the plain Developer API after its 20/day free-tier quota was flagged as the single biggest live-demo risk — auth is ADC/service account, no API key |
+| **BigQuery** | Hosts the raw HDX tables and the per-crisis need-score views that the allocation model reads |
 | **Firestore** | Live state store for every allocation run — what the frontend map and Ask feature read from |
 | **Cloud Run** | Hosts the FastAPI backend (`aidatlas-api/`) |
 | **Firebase Hosting** | Serves the frontend (`frontend/`) |
 | **Google Maps JavaScript API** | District map, dark-styled, real coordinates |
+| **Google Routes API** | Real driving routes between districts, for the road-chokepoint network multiplier in the OR-Tools dispatch model (switched to this from OSM's Overpass API, which proved unreliable from this build environment) |
+| **Earth Engine** | Live CHIRPS precipitation / MODIS NDVI anomalies (drought) and Sentinel-1 SAR flood-extent detection (floods) for the AI-drafted India crises |
+| **OR-Tools** (not a managed GCP service, but part of the stack) | CP-SAT constrained-dispatch solver, `aidatlas-api/optimizer.py` |
 
 ## Repo layout
 
 ```
-data/           HDX ingestion (data/fetch_hdx_dataset.py) -- the real Syria CSVs
-bigquery/       Schema + views (schema.sql) + load script (load_syria_data.sh)
-aidatlas-api/   FastAPI backend, deployed to Cloud Run; tests/ has the full suite
+data/           HDX ingestion + satellite/road-chokepoint fetch scripts -- see data/README.md
+bigquery/       Schema + views for both HRP crises (schema.sql, schema_myanmar.sql)
+aidatlas-api/   FastAPI backend (main.py + optimizer.py), deployed to Cloud Run; tests/ has the full suite
 frontend/       Vanilla JS dashboard, deployed to Firebase Hosting
 ```
 
@@ -52,7 +59,7 @@ bq query --use_legacy_sql=false < ../bigquery/schema.sql
 cd ../aidatlas-api
 python -m venv .venv && .venv/Scripts/activate
 pip install -r requirements.txt
-cp .env.example .env   # fill in GEMINI_API_KEY (see .env.example for the free-tier gotcha)
+cp .env.example .env   # fill in GCP_PROJECT_ID etc. -- auth is `gcloud auth application-default login`, no API key
 uvicorn main:app --reload --port 8080
 ```
 
@@ -71,5 +78,5 @@ python tests/e2e_flow.py <frontend-url> <screenshot-dir> # Playwright: load, all
 ## Honest notes, not overclaimed
 
 - 48 of 61 districts have real plotted map coordinates (derived from HDX's food-price market locations); the remaining 13 are listed in data, not given a fabricated point.
-- Gemini's free tier caps at 20 requests/day for `gemini-3.8-flash` (confirmed live, not documented anywhere obvious beforehand) — both `/allocate` and `/ask` degrade gracefully to real BigQuery/Firestore numbers without Gemini commentary if that's exhausted, rather than failing.
-- The allocation model is a simple, explainable proportional split by need score, not a constrained optimizer — a deliberate choice, see "Why this fits the brief" above.
+- The Gemini Developer API's free tier capped at 20 requests/day for `gemini-3.8-flash` (confirmed live) -- this is why the app runs on Vertex AI now instead; both `/allocate` and `/ask` still degrade gracefully to real BigQuery/Firestore numbers without Gemini commentary if a quota or outage hits, rather than failing.
+- The allocation model is a proportional split by need score for the two official-appeal crises (Syria, Myanmar) -- a deliberate explainability-first choice, see "Why this fits the brief" above. The two AI-drafted India crises use a real constrained OR-Tools solver instead, since there's no official funding pool to proportionally split in the first place.
