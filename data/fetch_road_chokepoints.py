@@ -16,11 +16,14 @@ real road, so losing access to one degrades access to the other.
 
 import json
 import math
+import os
 
 import polyline
 import requests
 
-API_KEY = "AIzaSyCu6xIYV6B-yIyoHDzY4PCHwSmrRN5fVZk"
+# Server-side key restricted to routes.googleapis.com -- never committed.
+# Set it in the environment (or data/.env) before running this script.
+API_KEY = os.environ["ROUTES_API_KEY"]
 ROUTES_URL = "https://routes.googleapis.com/directions/v2:computeRoutes"
 
 # Real regional logistics hubs -- the actual administrative/transport

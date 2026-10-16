@@ -4,5 +4,5 @@
 // Backend keys (Gemini, service accounts) never go in this file.
 const AIDATLAS_CONFIG = {
   API_BASE_URL: "https://aidatlas-api-866617346749.asia-southeast1.run.app",
-  GOOGLE_MAPS_API_KEY: "AIzaSyCu6xIYV6B-yIyoHDzY4PCHwSmrRN5fVZk",
+  GOOGLE_MAPS_API_KEY: "AIzaSyC659aJXNS9RRL2OWR8N3j9-0vHWl-Oyv8",
 };
