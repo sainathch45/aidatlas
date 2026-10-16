@@ -171,7 +171,22 @@ function showResult(body) {
     audioEl.style.display = "none";
   }
   el("negotiate-result").textContent = "";
+  el("why-price-result").style.display = "none";
 }
+
+el("why-price-btn").addEventListener("click", async () => {
+  if (!lastMatchId) return;
+  const resultEl = el("why-price-result");
+  resultEl.style.display = "block";
+  resultEl.textContent = "Checking…";
+  try {
+    const resp = await fetch(`${API_BASE}/matches/${lastMatchId}/pricing-explanation?language=${encodeURIComponent(currentLanguage)}`);
+    const body = await resp.json();
+    resultEl.textContent = body.explanation || "No explanation available right now.";
+  } catch {
+    resultEl.textContent = "Could not reach the server.";
+  }
+});
 
 el("negotiate-btn").addEventListener("click", async () => {
   const text = el("negotiate-input").value.trim();
