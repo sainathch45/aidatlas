@@ -6,6 +6,7 @@ google-cloud-firestore>=2.18
 google-cloud-speech>=2.41
 google-cloud-texttospeech>=2.38
 google-cloud-bigquery>=3.25
+earthengine-api>=1.0
 ortools>=9.11
 pydantic>=2.8
 python-dotenv>=1.0

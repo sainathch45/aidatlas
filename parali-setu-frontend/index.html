@@ -3,74 +3,75 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Parali Setu — Farmer</title>
+<title>Parali Setu — sell your stubble, don't burn it</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="landing.css">
 </head>
 <body>
-<div class="page">
+<div class="page landing-page">
 
   <header class="top">
     <h1>🌾 Parali Setu</h1>
     <nav>
-      <a href="index.html" class="active">Farmer</a>
+      <a href="index.html" class="active">About</a>
+      <a href="farmer.html">Farmer</a>
       <a href="company.html">Company</a>
     </nav>
   </header>
 
-  <div class="card">
-    <h2>ਆਪਣੀ ਪਰਾਲੀ ਦੀ ਸੂਚੀ ਦਿਓ / अपनी पराली की लिस्टिंग दें</h2>
-    <div class="lang-toggle">
-      <button id="lang-hi" class="active">Hindi</button>
-      <button id="lang-pa">Punjabi</button>
+  <section class="hero">
+    <p class="hero-eyebrow">Punjab &amp; Haryana, stubble-burning season</p>
+    <h2 class="hero-headline">A live match between farmers who have stubble, and buyers who'll pay for it — before it burns.</h2>
+    <p class="hero-sub">Parali (stubble) + Setu (bridge). Voice-first for farmers, a real optimizer underneath — not a chatbot layered on a spreadsheet.</p>
+    <div class="hero-ctas">
+      <a href="farmer.html" class="primary-cta">I'm a Farmer</a>
+      <a href="company.html" class="secondary-cta">I'm a Company</a>
     </div>
-    <p class="hint" style="margin-top:.8rem;">Type your listing, or press the mic and speak — quantity, crop, village, and when it's ready to pick up. A photo is optional.</p>
+  </section>
 
-    <div class="row" style="margin-top:.8rem;">
-      <textarea id="text-input" rows="2" placeholder="e.g. 10 quintal rice stubble in Sangrur, ready by 25 October"></textarea>
+  <section class="card guide-card">
+    <h2>How it works</h2>
+    <p class="hint" style="margin-top:-.3rem;margin-bottom:.9rem;">Two sides, one live match. Either can go first.</p>
+    <ol class="guide-steps">
+      <li>
+        <span class="step-num">1</span>
+        <div><strong>A company posts standing demand</strong><br><span class="step-detail">how much crop residue they need, what price they're offering, which quality grades they'll take.</span></div>
+      </li>
+      <li>
+        <span class="step-num">2</span>
+        <div><strong>A farmer lists stubble, by voice or text</strong><br><span class="step-detail">quantity, crop, village, when it's ready for pickup — speak it in Hindi or Punjabi, or type it.</span></div>
+      </li>
+      <li>
+        <span class="step-num">3</span>
+        <div><strong>A live match and price appear instantly</strong><br><span class="step-detail">a real optimizer (not a guess) matches listings to demand and sets the price, the moment either side acts.</span></div>
+      </li>
+      <li>
+        <span class="step-num">4</span>
+        <div><strong>Both sides confirm pickup</strong><br><span class="step-detail">the match is locked in; the company collects, the farmer gets paid instead of burning the field.</span></div>
+      </li>
+    </ol>
+  </section>
+
+  <section class="card map-card">
+    <h2>Recent fire activity <span class="map-badge">refreshed periodically, not live</span></h2>
+    <p class="hint" style="margin-top:-.3rem;margin-bottom:.8rem;">Real satellite fire detections (NASA FIRMS) over the last 7 days across the 8 demo districts — the actual stakes this marketplace exists to reduce.</p>
+    <div id="fire-map" class="fire-map"></div>
+    <p id="map-status" class="hint" style="margin-top:.6rem;"></p>
+  </section>
+
+  <section class="card closing-cta">
+    <p class="closing-text">Every October, Punjab's sky turns to smoke from stubble no one found a buyer for in time.</p>
+    <div class="hero-ctas">
+      <a href="farmer.html" class="primary-cta">List your stubble</a>
+      <a href="company.html" class="secondary-cta">Post your demand</a>
     </div>
-
-    <div class="row" style="align-items:center;margin-top:.6rem;">
-      <button id="record-btn" class="record" aria-label="Record your listing by voice">🎤</button>
-      <span id="record-status" class="hint" aria-live="polite">Tap to record</span>
-      <label class="file-pill" style="cursor:pointer;">
-        📷 <span id="photo-label">Add photo (optional)</span>
-        <input type="file" id="photo-input" accept="image/*" style="display:none;" aria-label="Attach a photo of the stubble pile">
-      </label>
-    </div>
-
-    <div class="row" style="margin-top:.8rem;">
-      <button id="submit-text" class="primary">Send listing</button>
-    </div>
-
-    <p id="status-line" class="hint" style="display:none;"></p>
-  </div>
-
-  <div id="result" style="display:none;" class="card">
-    <h2>Result</h2>
-    <div id="transcript-block" style="display:none;" class="transcript"></div>
-    <div id="error-block" style="display:none;" class="error"></div>
-    <div id="match-block" style="display:none;" class="match-card">
-      <div class="match-row"><span class="label">Quantity</span><span class="value" id="m-qty"></span></div>
-      <div class="match-row"><span class="label">Crop</span><span class="value" id="m-crop"></span></div>
-      <div class="match-row"><span class="label">Quality read</span><span class="value" id="m-quality"></span></div>
-      <div class="match-row"><span class="label">Buyer</span><span class="value" id="m-buyer"></span></div>
-      <div class="match-row"><span class="label">Price</span><span class="value" id="m-price"></span></div>
-      <div class="match-row"><span class="label">Pickup by</span><span class="value" id="m-pickup"></span></div>
-      <p class="explanation" id="m-explanation"></p>
-      <audio id="m-audio" controls style="display:none;"></audio>
-
-      <div class="row" style="margin-top:.6rem;">
-        <input type="text" id="negotiate-input" placeholder="e.g. can we get 9.50 per kg instead?">
-        <button id="negotiate-btn" class="secondary">Ask</button>
-      </div>
-      <p id="negotiate-result" class="hint"></p>
-    </div>
-  </div>
+  </section>
 
 </div>
 
 <script src="config.js"></script>
-<script src="app.js"></script>
+<script src="landing.js"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCu6xIYV6B-yIyoHDzY4PCHwSmrRN5fVZk&callback=initFireMap&v=weekly" async></script>
 </body>
 </html>

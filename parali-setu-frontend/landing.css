@@ -1,0 +1,42 @@
+/* Parali Setu landing page -- extends styles.css's committed light theme.
+   Kept in its own file since these rules (hero, numbered guide steps, the
+   map) are landing-page-specific, not reused by index.html/company.html. */
+
+.landing-page{max-width:760px;}
+
+.hero{padding:1.4rem .2rem 0;}
+.hero-eyebrow{font-family:var(--font-mono);font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;color:var(--accent-ink);margin:0 0 .6rem;}
+.hero-headline{font-family:var(--font-display);font-weight:600;font-size:2.1rem;line-height:1.18;margin:0 0 .8rem;text-wrap:balance;color:var(--ink);}
+.hero-sub{font-size:1.02rem;color:var(--ink-soft);text-wrap:pretty;max-width:34rem;margin:0 0 1.3rem;}
+
+.hero-ctas{display:flex;gap:.7rem;flex-wrap:wrap;}
+.primary-cta, .secondary-cta{
+  display:inline-flex;align-items:center;justify-content:center;
+  font-family:var(--font-body);font-weight:600;font-size:.95rem;
+  padding:.75rem 1.3rem;border-radius:8px;text-decoration:none;cursor:pointer;
+}
+.primary-cta{background:var(--accent);color:#fff;}
+.secondary-cta{background:transparent;border:1px solid var(--line);color:var(--ink);}
+
+/* .guide-steps/.step-num base rules live in styles.css (shared with the
+   compact "How this works" banner on farmer.html/company.html) -- this
+   just scales them up for the landing page's larger layout. */
+.guide-steps{gap:1rem;}
+.guide-steps li{gap:.9rem;}
+.step-num{width:1.9rem;height:1.9rem;font-size:.95rem;}
+.step-detail{font-size:.88rem;color:var(--ink-soft);}
+
+.map-badge{
+  font-family:var(--font-mono);font-size:.68rem;font-weight:500;letter-spacing:.02em;
+  text-transform:none;color:var(--smoke);margin-left:.5rem;vertical-align:middle;
+}
+.fire-map{width:100%;height:320px;border-radius:8px;border:1px solid var(--line);background:var(--bg);}
+
+.closing-cta{text-align:center;}
+.closing-text{font-family:var(--font-display);font-size:1.25rem;font-weight:500;text-wrap:balance;margin:0 0 1.1rem;color:var(--ink);}
+.closing-cta .hero-ctas{justify-content:center;}
+
+@media (max-width:480px){
+  .hero-headline{font-size:1.65rem;}
+  .fire-map{height:240px;}
+}

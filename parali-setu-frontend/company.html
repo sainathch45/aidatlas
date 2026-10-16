@@ -13,10 +13,21 @@
   <header class="top">
     <h1>🌾 Parali Setu</h1>
     <nav>
-      <a href="index.html">Farmer</a>
+      <a href="index.html" class="whatis-link">◀ What is this?</a>
+      <a href="farmer.html">Farmer</a>
       <a href="company.html" class="active">Company</a>
     </nav>
   </header>
+
+  <details class="card how-it-works">
+    <summary>How this works</summary>
+    <ol class="guide-steps guide-steps-compact">
+      <li><span class="step-num">1</span><div>A company posts standing demand — that's you, below</div></li>
+      <li><span class="step-num">2</span><div>A farmer lists stubble, by voice or text</div></li>
+      <li><span class="step-num">3</span><div>A live match and price appear instantly</div></li>
+      <li><span class="step-num">4</span><div>Both sides confirm pickup</div></li>
+    </ol>
+  </details>
 
   <div class="card">
     <h2>Company</h2>
@@ -40,6 +51,7 @@
 
   <div class="card">
     <h2>Incoming Supply</h2>
+    <div id="constraint-progress" style="display:none;margin-bottom:.6rem;"></div>
     <div id="incoming-supply"><p class="empty-state">Loading…</p></div>
   </div>
 
@@ -62,6 +74,10 @@
       <input type="number" id="demand-qty" placeholder="quantity needed (kg)">
       <input type="number" id="demand-price" placeholder="price offered (₹/kg)" step="0.01">
     </div>
+    <div class="row" style="margin-top:.5rem;">
+      <input type="text" id="demand-constraint" placeholder="optional sourcing rule, e.g. at least 60% of what I buy should be dry">
+    </div>
+    <p class="hint" style="margin-top:.3rem;">Stated in plain language, parsed into a real constraint the matching engine actually enforces on every solve — not just a note.</p>
     <div class="row" style="margin-top:.5rem;">
       <button id="post-demand-btn" class="primary">Post demand</button>
     </div>

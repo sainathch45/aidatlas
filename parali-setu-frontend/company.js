@@ -17,6 +17,7 @@ async function loadDashboard() {
     renderRecommendation(body.recommendation);
     renderIncomingSupply(body.incoming_supply);
     renderActiveMatches(body.active_matches);
+    renderConstraintProgress(body.constraint_progress);
   } catch (err) {
     el("recommendation").innerHTML = `<p class="error">Could not reach the server.</p>`;
     el("incoming-supply").innerHTML = "";
@@ -43,9 +44,22 @@ function renderRecommendation(rec) {
     </div>`;
 }
 
+function renderConstraintProgress(progress) {
+  const el2 = document.getElementById("constraint-progress");
+  if (!el2) return;
+  if (!progress || progress.length === 0) {
+    el2.style.display = "none";
+    return;
+  }
+  el2.style.display = "block";
+  el2.innerHTML = progress.map((p) => `
+    <p class="hint">Sourcing rule — at least ${p.target_pct}% ${p.quality_grade}: <strong>${p.met_pct}% met this solve</strong> (${p.achieved_kg} of ${p.target_kg} kg target).</p>
+  `).join("");
+}
+
 function renderIncomingSupply(matches) {
   if (!matches || matches.length === 0) {
-    el("incoming-supply").innerHTML = `<p class="empty-state">No matching supply yet.</p>`;
+    el("incoming-supply").innerHTML = `<p class="empty-state">No listings matched yet<span class="empty-state-detail">this fills in once a farmer lists stubble that fits your standing demand below.</span></p>`;
     return;
   }
   const rows = matches.map((m) => `
@@ -94,11 +108,13 @@ el("company-select").addEventListener("change", loadDashboard);
 
 el("post-demand-btn").addEventListener("click", async () => {
   const companyId = currentCompanyId();
+  const constraintText = el("demand-constraint").value.trim();
   const payload = {
     product: el("demand-product").value.trim(),
     crop_type: el("demand-crop").value,
     quantity_needed_kg: parseFloat(el("demand-qty").value),
     price_offer_per_kg: parseFloat(el("demand-price").value),
+    custom_constraint_text: constraintText || null,
   };
   if (!payload.product || !payload.quantity_needed_kg || !payload.price_offer_per_kg) {
     el("demand-result").textContent = "Please fill in product, quantity, and price.";
@@ -112,7 +128,11 @@ el("post-demand-btn").addEventListener("click", async () => {
       body: JSON.stringify(payload),
     });
     if (resp.ok) {
-      el("demand-result").textContent = "Posted.";
+      const body = await resp.json();
+      const constraints = body.custom_constraints || [];
+      el("demand-result").textContent = constraintText && constraints.length === 0
+        ? "Posted — but that sourcing rule wasn't recognized, so it wasn't applied."
+        : "Posted.";
       loadDashboard();
     } else {
       el("demand-result").textContent = "Could not post demand.";
